@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+/* Force HTTPS: if this file is ever served over plain http:// on a real
+   domain (not localhost/file), bounce to the https:// version immediately.
+   This is a client-side safety net only — see /_headers, /vercel.json and
+   /.htaccess for the real, server-level HTTPS + HSTS enforcement, which is
+   what actually matters and must be configured on whichever host you use. */
+(function(){
+  if (window.location.protocol === 'http:' &&
+      !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)) {
+    window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search + window.location.hash);
+  }
+})();
+</script>
+<script>
+/* Backend location. Leave empty when FastAPI serves this page (same origin) or when running
+   locally (auto-detects http://localhost:8000). For a separately hosted frontend set, e.g.:
+   window.UDYAM_CONFIG = { apiBase: 'https://api.your-domain.example/api/v1' };            */
+window.UDYAM_CONFIG = window.UDYAM_CONFIG || {};
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Udyam-Nirdesh — Funding Readiness & Scheme Navigation for Entrepreneurs</title>
+<meta name="description" content="Udyam-Nirdesh helps marginalised entrepreneurs and students find the right government funding scheme, check their funding readiness, and connect with investors and channel partners — a Smart India Hackathon prototype.">
+<meta name="keywords" content="Udyam Nirdesh, PMEGP, MUDRA loan, PM SVANidhi, MSME schemes, funding readiness, Smart India Hackathon, scheme navigation, entrepreneur funding India">
+<meta name="author" content="Udyam-Nirdesh Team">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://udyam-nirdesh.example.com/">
+<!-- Replace udyam-nirdesh.example.com above and in sitemap.xml / robots.txt with your real deployed domain. -->
+
+<!-- Open Graph / social preview -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Udyam-Nirdesh">
+<meta property="og:title" content="Udyam-Nirdesh — Funding Readiness & Scheme Navigation">
+<meta property="og:description" content="AI-powered funding readiness and scheme navigation for marginalised entrepreneurs. Find the right scheme, get funding-ready, apply with confidence.">
+<meta property="og:image" content="https://udyam-nirdesh.example.com/social-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://udyam-nirdesh.example.com/">
+<meta property="og:locale" content="en_IN">
+
+<!-- Twitter card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Udyam-Nirdesh — Funding Readiness & Scheme Navigation">
+<meta name="twitter:description" content="AI-powered funding readiness and scheme navigation for marginalised entrepreneurs. Find the right scheme, get funding-ready, apply with confidence.">
+<meta name="twitter:image" content="https://udyam-nirdesh.example.com/social-preview.png">
+
+<!-- Favicons -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="theme-color" content="#182335">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --ink:#182335;         /* primary text / sidebar */
+  --ink-soft:#5B6579;    /* secondary text */
+  --paper:#F7F4EC;       /* app background */
+  --panel:#FFFFFF;       /* card / surface background */
+  --line:#E4DECC;        /* borders & dividers */
+  --marigold:#E0912B;    /* decorative accent only — see note below */
+  --marigold-deep:#A3661B;   /* WCAG-AA fix: darkened so white button text hits 4.5:1 (was #B5701A @ 2.5:1) */
+  --marigold-deeper:#7A4C14; /* button hover / pill text — higher contrast still */
+  --marigold-ghost:#A3661B;  /* ghost-button text on light backgrounds */
+  --marigold-soft:#FBEBD3;
+  /* NOTE ON --marigold (#E0912B): kept only for decorative, non-text uses
+     (donut ring, progress gradient, hero glow, status border strips) where
+     WCAG's 3:1/4.5:1 contrast rules don't apply. It is never used as text
+     or as a background behind white text anymore — see contrast audit in
+     README-deploy-notes.md for the numbers. */
+  --banyan:#276749;      /* success / approved / growth */
+  --banyan-soft:#E3F1E9;
+  --rust:#B33A2E;        /* danger / warning */
+  --rust-soft:#FBEAE7;
+  --sidebar:#182335;
+  --sidebar-line:#2B3A54;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --radius-sm:8px;
+  --shadow:0 10px 28px rgba(24,35,53,.07);
+}
+body.dark{
+  --ink:#EFE9DA; --ink-soft:#B3ACA0; --paper:#12161F; --panel:#1B2130;
+  --line:#2C3444; --sidebar:#0C0F16; --sidebar-line:#232A38;
+  --shadow:0 10px 28px rgba(0,0,0,.35);
+  --marigold-ghost:#E8A34D; /* lighter amber so ghost-button text keeps 4.5:1+ on dark panels */
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:'IBM Plex Sans',Arial,sans-serif; font-size:14.5px; line-height:1.55;
+}
+h1,h2,h3{font-family:'Fraunces',serif; margin:0; color:var(--ink)}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer; border:0; background:none}
+a{color:inherit; text-decoration:none}
+.hidden{display:none !important}
+::selection{background:var(--marigold-soft)}
+svg{stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+
+/* ============================================================
+   PRIMITIVES
+   ============================================================ */
+.field{
+  width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:var(--radius-sm);
+  background:var(--panel); color:var(--ink); outline:none;
+}
+.field:focus{border-color:var(--marigold-deep); box-shadow:0 0 0 3px var(--marigold-soft)}
+label{display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin:0 0 6px}
+
+.btn{
+  display:inline-flex; align-items:center; gap:7px; padding:10px 16px; border-radius:var(--radius-sm);
+  font-weight:600; background:var(--marigold-deep); color:#fff; white-space:nowrap;
+  min-height:40px;
+}
+.btn:hover{background:var(--marigold-deeper)}
+.btn.secondary{background:transparent; color:var(--ink); border:1px solid var(--line)}
+.btn.secondary:hover{border-color:var(--ink-soft)}
+.btn.ghost{background:transparent; color:var(--marigold-ghost); padding:10px 4px}
+.btn.danger{background:var(--rust); color:#fff}
+.btn.small{padding:7px 11px; font-size:12.5px; border-radius:7px}
+.btn svg{width:16px;height:16px}
+.iconbtn{
+  width:38px; height:38px; display:inline-grid; place-items:center;
+  border:1px solid var(--line); border-radius:var(--radius-sm); background:var(--panel);
+}
+.iconbtn svg{width:18px;height:18px}
+
+.pill{
+  display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px;
+  background:var(--marigold-soft); color:var(--marigold-deeper); font-size:11.5px; font-weight:700;
+}
+.pill.green{background:var(--banyan-soft); color:var(--banyan)}
+.pill.muted{background:var(--line); color:var(--ink-soft)}
+.tag{
+  display:inline-flex; padding:3px 9px; border-radius:999px; border:1px solid var(--line);
+  font-size:11px; color:var(--ink-soft);
+}
+.muted{color:var(--ink-soft)}
+
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg);
+  padding:18px; box-shadow:var(--shadow);
+}
+.ledger{border:1px solid var(--line); border-radius:var(--radius-lg); background:var(--panel); overflow:auto; -webkit-overflow-scrolling:touch}
+.ledger-row{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:13px 16px; border-bottom:1px solid var(--line); border-left:3px solid transparent;
+}
+.ledger-row:last-child{border-bottom:0}
+.ledger-row.tone-good{border-left-color:var(--banyan)}
+.ledger-row.tone-warn{border-left-color:var(--marigold)}
+.ledger-row.tone-bad{border-left-color:var(--rust)}
+
+.grid{display:grid; gap:14px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.formgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.full{grid-column:1/-1}
+
+.progress{height:8px; background:var(--line); border-radius:999px; overflow:hidden}
+.progress span{display:block; height:100%; background:linear-gradient(90deg,var(--marigold),var(--banyan))}
+
+.table{width:100%; min-width:520px; border-collapse:collapse}
+.table th,.table td{padding:10px; border-bottom:1px solid var(--line); text-align:left; font-size:13px}
+
+.toast{
+  position:fixed; right:20px; bottom:20px; z-index:99; background:var(--ink); color:var(--paper);
+  padding:12px 16px; border-radius:var(--radius-sm); box-shadow:var(--shadow); display:none; font-size:13px;
+}
+.modal{position:fixed; inset:0; background:rgba(16,20,28,.5); display:none; place-items:center; z-index:30; padding:20px}
+.modal.show{display:grid}
+.modalbox{width:min(640px,100%); max-height:90vh; overflow:auto; background:var(--panel); border-radius:var(--radius-lg); padding:22px; border:1px solid var(--line)}
+
+.title{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:20px; flex-wrap:wrap}
+.title h1{font-size:26px; font-weight:600}
+.title .muted{font-size:13px; margin-top:3px}
+
+.empty{padding:26px; text-align:center; color:var(--ink-soft); border:1px dashed var(--line); border-radius:var(--radius-lg)}
+
+/* ============================================================
+   LOGIN SCREEN
+   ============================================================ */
+.login{min-height:100vh; display:grid; place-items:center; padding:24px}
+.loginbox{
+  width:min(1040px,100%); display:grid; grid-template-columns:1.05fr .95fr;
+  background:var(--panel); border:1px solid var(--line); border-radius:24px; overflow:hidden; box-shadow:var(--shadow);
+}
+.loginhero{
+  padding:52px; background:var(--ink); color:#F3EFE3; position:relative;
+  background-image:radial-gradient(circle at 15% 20%,rgba(224,145,43,.25),transparent 40%), radial-gradient(circle at 90% 85%,rgba(39,103,73,.3),transparent 40%);
+}
+.loginhero .badge{
+  display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px;
+  background:rgba(255,255,255,.12); font-size:11.5px; margin-bottom:18px;
+}
+.loginhero h1{font-size:38px; color:#fff; margin-bottom:10px}
+.loginhero p{font-size:16px; line-height:1.6; color:#D8D2C2; max-width:38ch}
+.loginhero p.lede{color:#fff; font-weight:600; margin-top:14px}
+.herocta{
+  display:inline-flex; align-items:center; gap:9px; margin-top:24px; padding:14px 22px;
+  border-radius:var(--radius-sm); background:var(--marigold); color:var(--ink); font-weight:700;
+  font-size:15px; box-shadow:0 8px 22px rgba(224,145,43,.35);
+}
+.herocta:hover{background:#EEA347}
+.loginfeatures{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:28px}
+.loginfeatures div{
+  padding:12px; border-radius:var(--radius-sm); background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14); font-size:13px; display:flex; gap:8px; align-items:center;
+}
+.loginform{padding:44px}
+.loginform h2{font-size:22px; margin-bottom:4px}
+.role4{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin:22px 0 16px}
+.role4 button{
+  padding:12px 10px; border-radius:var(--radius-sm); background:var(--paper); border:1px solid var(--line);
+  font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; justify-content:center;
+}
+.role4 button.active{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+/* was color:#fff — in dark mode --ink is a light colour, so white-on-white
+   text was nearly invisible. --paper flips correctly with the theme. */
+.pass{position:relative}
+.pass button{position:absolute; right:6px; top:6px; padding:6px 9px; font-size:12px; color:var(--ink-soft)}
+#loginError,#registerError{color:var(--rust); font-size:12.5px; margin-top:10px; min-height:1em}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+.app{display:none; min-height:100vh}
+.app.active{display:flex}
+.sidebar{
+  width:242px; background:var(--sidebar); border-right:1px solid var(--sidebar-line);
+  padding:20px 12px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; color:#CFCABB;
+}
+.brand{display:flex; align-items:center; gap:10px; padding:6px 8px 22px; color:#fff}
+.brand .logo{
+  width:36px; height:36px; border-radius:10px; display:grid; place-items:center; font-family:'Fraunces',serif;
+  font-weight:700; background:var(--marigold-deep); color:#fff; flex-shrink:0;
+}
+.brand span{font-weight:600; font-size:15px}
+.nav{display:grid; gap:3px; flex:1; overflow-y:auto}
+.nav button{
+  display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:10px;
+  color:#B9B3A2; font-size:13.5px; font-weight:500; text-align:left;
+}
+.nav button svg{width:17px; height:17px; flex-shrink:0}
+.nav button:hover{background:rgba(255,255,255,.06); color:#fff}
+.nav button.active{background:var(--marigold-deep); color:#fff}
+.sidebarbottom{padding-top:10px; border-top:1px solid var(--sidebar-line); margin-top:8px}
+.sidebarbottom .btn{width:100%; justify-content:center; background:rgba(255,255,255,.08); color:#fff}
+.sidebarbottom .btn:hover{background:rgba(255,255,255,.16)}
+
+.main{flex:1; min-width:0}
+.topbar{
+  height:66px; background:var(--panel); border-bottom:1px solid var(--line); display:flex;
+  align-items:center; justify-content:space-between; padding:0 26px; position:sticky; top:0; z-index:5;
+}
+.topbar b{font-family:'Fraunces',serif; font-size:18px; font-weight:600}
+.topbar .right{display:flex; align-items:center; gap:8px}
+.content{padding:26px; max-width:1360px; margin:auto}
+.page{display:none}
+.page.active{display:block; animation:fade .18s ease}
+@keyframes fade{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
+.footer{text-align:center; color:var(--ink-soft); font-size:11.5px; padding:30px 0 8px}
+
+/* ============================================================
+   DASHBOARD-SPECIFIC
+   ============================================================ */
+.greeting-row{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px; flex-wrap:wrap}
+.greeting-row h1{font-size:26px}
+
+.hero{display:grid; grid-template-columns:220px 1fr; gap:26px; align-items:center; margin-bottom:22px}
+.donut-wrap{position:relative; width:170px; height:170px; margin:auto}
+.donut-ring{
+  width:100%; height:100%; border-radius:50%;
+  background:conic-gradient(var(--ring-color,var(--marigold)) calc(var(--pct,0)*3.6deg), var(--line) 0);
+  display:grid; place-items:center;
+}
+.donut-inner{
+  width:71%; height:71%; border-radius:50%; background:var(--panel); display:grid; place-items:center;
+  flex-direction:column; text-align:center; box-shadow:inset 0 0 0 1px var(--line);
+}
+.donut-inner b{font-family:'Fraunces',serif; font-size:30px; display:block; line-height:1}
+.donut-inner span{font-size:11px; color:var(--ink-soft)}
+
+.hero-side{display:flex; flex-direction:column; gap:8px}
+.hero-side .eyebrow{font-size:13px; color:var(--ink-soft)}
+.hero-scheme{
+  border:1px solid var(--line); border-radius:var(--radius-lg); padding:16px; background:var(--panel);
+}
+.hero-scheme h3{font-size:17px; margin-bottom:4px}
+
+.metric-row{grid-template-columns:repeat(4,1fr); margin-bottom:22px}
+.metric-card{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:16px;
+}
+.metric-card .label{font-size:12px; color:var(--ink-soft); font-weight:600}
+.metric-card .value{font-family:'Fraunces',serif; font-size:24px; margin-top:6px}
+.metric-card .sub{font-size:11.5px; color:var(--ink-soft); margin-top:3px}
+
+.journey-list{display:grid; gap:0}
+.journey-item{
+  display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--line);
+}
+.journey-item:last-child{border-bottom:0}
+.journey-num{
+  width:26px; height:26px; border-radius:50%; background:var(--paper); border:1px solid var(--line);
+  display:grid; place-items:center; font-size:12px; font-weight:700; color:var(--ink-soft); flex-shrink:0;
+}
+.journey-item b{font-size:13.5px; display:block}
+.journey-item small{color:var(--ink-soft); font-size:12px}
+.journey-item button{margin-left:auto}
+
+.pipeline{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px}
+.pipeline .step{
+  min-width:132px; flex:1; padding:12px; border-radius:var(--radius-md); background:var(--paper);
+  border:1px solid var(--line); text-align:left;
+}
+.pipeline .step b{display:block; font-size:12px; margin-bottom:4px}
+.pipeline .step small{color:var(--ink-soft); font-size:11px}
+
+/* ============================================================
+   MISC PAGE PATTERNS
+   ============================================================ */
+.filters{display:flex; gap:9px; flex-wrap:wrap; margin-bottom:15px}
+.filters .field{width:auto; min-width:150px}
+.schemegrid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+.scheme-card{border:1px solid var(--line); border-radius:var(--radius-lg); background:var(--panel); padding:16px}
+.scheme-card h3{font-size:16px; margin:8px 0 2px}
+.scheme-card .amount{font-family:'Fraunces',serif; font-size:19px; margin:8px 0}
+.why{margin-top:10px; padding:10px 12px; border-radius:var(--radius-sm); background:var(--paper); font-size:12.5px; line-height:1.7}
+.metric-line{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--line); font-size:13px}
+.metric-line:last-child{border-bottom:0}
+.toolgrid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.marketgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+.projectcover{
+  height:96px; border-radius:var(--radius-md) var(--radius-md) 0 0; display:grid; place-items:center;
+  color:#fff; font-family:'Fraunces',serif; font-size:30px; font-weight:600;
+  background:linear-gradient(135deg,var(--ink),var(--banyan));
+}
+.projectbody{padding:14px}
+.projectmeta{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0}
+.match{color:var(--banyan); font-weight:700; font-size:11.5px}
+.chatbox{min-height:300px; max-height:420px; overflow:auto; background:var(--paper); padding:12px; border-radius:var(--radius-md); display:flex; flex-direction:column; gap:8px}
+.msg{max-width:80%; padding:9px 12px; border-radius:12px; font-size:13px; line-height:1.5}
+.msg.bot{background:var(--panel); border:1px solid var(--line)}
+.msg.user{margin-left:auto; background:var(--ink); color:#fff}
+.chatinput{display:flex; gap:8px; margin-top:10px}
+.chips{display:flex; gap:7px; flex-wrap:wrap; margin:10px 0}
+
+/* ============================================================
+   COOKIE CONSENT BANNER
+   ============================================================ */
+.cookiebar{
+  position:fixed; left:16px; right:16px; bottom:16px; z-index:80;
+  max-width:760px; margin:0 auto; background:var(--ink); color:#F3EFE3;
+  border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:16px 18px;
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+}
+.cookiebar.hidden{display:none !important}
+.cookiebar p{margin:0; font-size:12.5px; line-height:1.6; color:#D8D2C2; flex:1; min-width:220px}
+.cookiebar a{text-decoration:underline; color:#fff}
+.cookiebar .cookiebtns{display:flex; gap:8px; justify-content:flex-end}
+.cookiebar .btn.secondary{border-color:rgba(255,255,255,.3); color:#fff}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:1080px){
+  .g4{grid-template-columns:repeat(2,1fr)} .metric-row{grid-template-columns:repeat(2,1fr)}
+  .schemegrid,.marketgrid{grid-template-columns:1fr 1fr} .toolgrid{grid-template-columns:1fr}
+  .hero{grid-template-columns:1fr; text-align:center} .donut-wrap{margin:auto}
+  .sidebar{width:74px} .brand span,.nav button span,.sidebarbottom .btn span{display:none}
+  .brand{justify-content:center} .nav button{justify-content:center}
+}
+@media(max-width:760px){
+  .loginbox{grid-template-columns:1fr} .loginhero{display:none}
+  .sidebar{position:fixed; z-index:10; bottom:0; top:auto; height:64px; width:100%; flex-direction:row; border-right:0; border-top:1px solid var(--sidebar-line); padding:6px 4px}
+  .brand,.sidebarbottom{display:none}
+  .nav{display:flex; flex-direction:row; justify-content:space-around; overflow-x:auto}
+  .nav button{flex-direction:column; font-size:9.5px; gap:2px; padding:6px; min-height:44px; min-width:44px}
+  .main{padding-bottom:64px} .content{padding:16px}
+  .g2,.g3,.g4,.metric-row,.schemegrid,.marketgrid,.toolgrid,.formgrid{grid-template-columns:1fr}
+  .title{flex-direction:column}
+  .role4{grid-template-columns:1fr}
+  /* 16px prevents iOS Safari from auto-zooming the page when a field gets focus */
+  .field,select,input,textarea{font-size:16px}
+  .topbar{padding:0 14px; flex-wrap:wrap; height:auto; min-height:60px; gap:8px}
+  .topbar .right{flex-wrap:wrap; gap:6px}
+  .cookiebar{flex-direction:column; align-items:stretch !important; text-align:left}
+  .cookiebar .cookiebtns{justify-content:stretch !important}
+  .cookiebar .cookiebtns .btn{flex:1}
+}
+
+/* checkbox groups (admin scheme / partner forms) */
+.checkgroup{display:flex; flex-wrap:wrap; gap:8px 16px}
+label.check{display:inline-flex; align-items:center; gap:6px; margin:0; font-size:13px; font-weight:500; color:var(--ink)}
+label.check input{width:auto; margin:0}
+button:disabled,.btn:disabled{opacity:.6; cursor:progress}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login" class="login">
+  <div class="loginbox">
+    <div class="loginhero">
+      <span class="badge">🇮🇳 Smart India Hackathon Prototype</span>
+      <h1>Udyam-Nirdesh</h1>
+      <p>AI-powered funding readiness &amp; scheme navigation for marginalised entrepreneurs.</p>
+      <p class="lede">Find the right scheme. Get funding-ready. Apply with confidence.</p>
+      <div class="loginfeatures">
+        <div>✓ Scheme matching</div><div>✓ Readiness score</div>
+        <div>✓ Funding tools</div><div>✓ Application tracking</div>
+      </div>
+      <button class="herocta" onclick="quickDemoLogin()">▶ Try the live demo — no signup needed</button>
+    </div>
+    <div class="loginform">
+      <h2>Welcome back</h2>
+      <div class="muted">Choose your demo role to continue.</div>
+      <div class="role4" id="roleRow">
+        <button id="roleUser" class="active" onclick="setRole('user')">Entrepreneur / Student</button>
+        <button id="roleInvestor" onclick="setRole('investor')">Investor</button>
+        <button id="rolePartner" onclick="setRole('partner')">Channel Partner</button>
+        <button id="roleAdmin" onclick="setRole('admin')">Admin</button>
+      </div>
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" class="field" type="email" required autocomplete="username">
+      <label style="margin-top:12px" for="loginPass">Password</label>
+      <div class="pass"><input id="loginPass" class="field" type="password" required autocomplete="current-password"><button type="button" onclick="togglePass('loginPass',this)">Show</button></div>
+      <label style="display:flex; gap:8px; align-items:center; font-weight:600; margin-top:14px; color:var(--ink)">
+        <input id="remember" type="checkbox" checked style="width:auto"> Remember login
+      </label>
+      <button id="loginBtn" class="btn" style="width:100%; justify-content:center; margin-top:14px" onclick="login()">Login</button>
+      <button class="btn secondary" style="width:100%; justify-content:center; margin-top:9px" onclick="showRegister()">+ Create new account</button>
+      <div id="loginError" role="alert" aria-live="polite"></div>
+
+      <div id="registerPanel" class="hidden" style="margin-top:16px; padding-top:16px; border-top:1px solid var(--line)">
+        <h3 style="margin:0 0 10px; font-size:16px; font-family:'Fraunces',serif">Create your account</h3>
+        <label>Account role</label>
+        <select id="regRole" class="field">
+          <option value="user">Entrepreneur / Student</option>
+          <option value="investor">Investor</option>
+          <option value="partner">Private Channel Partner</option>
+        </select>
+        <label style="margin-top:10px" for="regName">Full name</label>
+        <input id="regName" class="field" required autocomplete="name" placeholder="Your name">
+        <label style="margin-top:10px" for="regEmail">Email</label>
+        <input id="regEmail" class="field" type="email" required autocomplete="email" placeholder="you@example.com">
+        <label style="margin-top:10px" for="regPass">Password</label>
+        <div class="pass"><input id="regPass" class="field" type="password" required minlength="8" autocomplete="new-password" placeholder="Create a password (min. 8 characters)"><button type="button" onclick="togglePass('regPass',this)">Show</button></div>
+        <label style="margin-top:10px" for="regConfirm">Confirm password</label>
+        <input id="regConfirm" class="field" type="password" required autocomplete="new-password" placeholder="Repeat password">
+        <!-- Honeypot spam trap: real users never see or fill this field.
+             Any automated bot filling every input on the form will fill it,
+             which flags the submission as spam. -->
+        <div aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden">
+          <label for="regWebsite">Leave this field empty</label>
+          <input id="regWebsite" tabindex="-1" autocomplete="off">
+        </div>
+        <button id="registerBtn" class="btn green" style="width:100%; justify-content:center; margin-top:14px; background:var(--banyan)" onclick="createAccount()">Create account</button>
+        <button class="btn secondary" style="width:100%; justify-content:center; margin-top:9px" onclick="hideRegister()">Back to login</button>
+        <div id="registerError" role="alert" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--ink-soft)">
+    &copy; <span id="yr"></span> Udyam-Nirdesh &middot; <a href="privacy.html" style="text-decoration:underline">Privacy Policy</a> &middot; <a href="terms.html" style="text-decoration:underline">Terms &amp; Conditions</a>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app" class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">U</div><span>Udyam-Nirdesh</span></div>
+    <nav id="nav" class="nav"></nav>
+    <div class="sidebarbottom">
+      <button class="btn" id="logoutBtn" onclick="logout()"><span>Logout</span></button>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <b id="topTitle">Dashboard</b>
+      <div class="right">
+        <select id="theme" class="field" style="width:auto" onchange="changeTheme(this.value)">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <select id="lang" class="field" style="width:auto" onchange="changeLang(this.value)">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="pa">ਪੰਜਾਬੀ</option>
+        </select>
+        <button class="iconbtn" onclick="logout()" title="Logout">⎋</button>
+      </div>
+    </header>
+    <section class="content">
+      <div id="pages"></div>
+      <div class="footer">Udyam-Nirdesh · AI-powered funding readiness &amp; scheme navigation prototype ·
+        <a href="privacy.html" style="text-decoration:underline">Privacy Policy</a> ·
+        <a href="terms.html" style="text-decoration:underline">Terms &amp; Conditions</a>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal"><div class="modalbox" id="modalbox"></div></div>
+
+<div id="cookiebar" class="cookiebar hidden" role="dialog" aria-live="polite" aria-label="Cookie consent">
+  <p>We use essential browser storage (your sign-in token and display preferences) to run this demo, and (only if you accept) a small
+     amount of analytics to see how the prototype is used. See our
+     <a href="privacy.html">Privacy Policy</a> for details.</p>
+  <div class="cookiebtns">
+    <button class="btn secondary small" onclick="setCookieConsent(false)">Decline</button>
+    <button class="btn small" onclick="setCookieConsent(true)">Accept</button>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   UDYAM-NIRDESH — app.js  (API-backed)
+
+   Talks to the FastAPI backend (see /backend) for everything that matters:
+     auth · profile · schemes & matching · documents · partners · applications ·
+     readiness score · funding tools.
+   Only the marketplace / investor / connections / private-channel features are
+   still frontend-only (localStorage), because they are not part of the core
+   funding-navigation flow yet.
+
+   Nothing sensitive is kept in localStorage any more: no passwords, no profile,
+   no documents. The sign-in token lives in sessionStorage (or localStorage if
+   "Remember login" is ticked) and is removed on logout / expiry.
+   ========================================================================== */
+
+const STORAGE_KEY = 'udyamNirdesh_v3';
+/* v2 kept plaintext passwords and Base64 documents in localStorage — wipe it. */
+const LEGACY_STORAGE_KEYS = ['udyamNirdesh_v2'];
+const TOKEN_KEY = 'udyamToken';
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;   // keep in sync with MAX_UPLOAD_BYTES on the server
+
+/* Demo conveniences (prefilled login + "Try the live demo" button).
+   Set enabled:false — and SEED_DEMO_USER=false on the server — before a real deployment. */
+const DEMO = { enabled: true, email: 'user@udyam.local', password: 'user123', adminEmail: 'admin@udyam.local' };
+
+/* ---------------------------------------------------------------------- *
+ * API BASE URL
+ *   1. window.UDYAM_CONFIG.apiBase (set it in index.html) wins;
+ *   2. opened from file:// or a local dev server on another port -> http://localhost:8000
+ *   3. otherwise same origin (FastAPI serving this page, or a reverse proxy) -> /api/v1
+ * ---------------------------------------------------------------------- */
+function resolveApiBase(){
+  const cfg = window.UDYAM_CONFIG && window.UDYAM_CONFIG.apiBase;
+  if (cfg) return String(cfg).replace(/\/+$/, '');
+  const local = location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  if (local && location.port !== '8000') return 'http://localhost:8000/api/v1';
+  return '/api/v1';
+}
+const API_BASE = resolveApiBase();
+
+/* ---------------------------------------------------------------------- *
+ * ICONS — small inline stroke icons, keyed by nav id / purpose
+ * ---------------------------------------------------------------------- */
+const ICONS = {
+  dashboard: '<svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>',
+  profile: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 4.5-6 7.5-6s6 2 7.5 6"/></svg>',
+  documents: '<svg viewBox="0 0 24 24"><path d="M3 7a1 1 0 0 1 1-1h4l2 2h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7z"/></svg>',
+  schemes: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M15 9l-2 6-6 2 2-6z"/></svg>',
+  readiness: '<svg viewBox="0 0 24 24"><path d="M4 14a8 8 0 1 1 16 0"/><path d="M12 14l4-4"/><circle cx="12" cy="14" r=".6" fill="currentColor"/></svg>',
+  tools: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M8 7h8M8 11h2m3 0h2M8 15h2m3 0h2M8 19h2"/></svg>',
+  partners: '<svg viewBox="0 0 24 24"><path d="M3 12l4-4 4 3 3-3 4 4"/><path d="M3 12v4l4 3M21 12v4l-4 3"/></svg>',
+  applications: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="17" rx="1.5"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 11h6M9 15h6"/></svg>',
+  assistant: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>',
+  users: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c1-3.5 3.5-5.5 6-5.5s5 2 6 5.5"/><path d="M15.5 14.8c2 .3 3.6 2 4.5 5.2"/></svg>',
+  settings: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2.7-1.6L15.4 2h-3.8l-.4 2.8a7 7 0 0 0-2.7 1.6l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 6 12c0 .5.05 1 .2 1.6l-2 1.5 2 3.4 2.3-.9c.8.7 1.7 1.3 2.7 1.6l.4 2.8h3.8l.4-2.8a7 7 0 0 0 2.7-1.6l2.3.9 2-3.4-2-1.5c.15-.5.2-1.1.2-1.6z"/></svg>',
+  marketplace: '<svg viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M9 20v-6h6v6"/></svg>',
+  saved: '<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.7 6.2.6-4.7 4.2 1.4 6.2L12 16.9 6.5 19.7l1.4-6.2-4.7-4.2 6.2-.6z"/></svg>',
+  connections: '<svg viewBox="0 0 24 24"><path d="M9 15l6-6"/><path d="M8 13l-2 2a3.5 3.5 0 0 0 5 5l2-2"/><path d="M16 11l2-2a3.5 3.5 0 0 0-5-5l-2 2"/></svg>',
+  private: '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  projects: '<svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="1.5"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>',
+  logout: '<svg viewBox="0 0 24 24"><path d="M9 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h3"/><path d="M15 16l4-4-4-4"/><path d="M19 12H9"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>',
+  warn: '<svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>',
+};
+function icon(id){ return ICONS[id] || ''; }
+
+/* ---------------------------------------------------------------------- *
+ * DEFAULT DATA — marketplace demo projects (frontend-only feature).
+ * Schemes, partners and documents now come from the backend.
+ * ---------------------------------------------------------------------- */
+const DEFAULT_PROJECTS = [
+  {id:'demo-p1', name:'AgriSmart Water Monitor', description:'Low-cost smart irrigation monitoring for small farms.',
+   category:'Agriculture', stage:'MVP', location:'Punjab, India', funding:800000, equity:8,
+   problem:'Water is often overused because farmers lack timely soil data.',
+   solution:'Affordable sensors with a simple dashboard for irrigation decisions.',
+   businessModel:'Hardware plus subscription', team:'Student engineering team',
+   ownerId:'demo-owner-1', ownerName:'Demo User', published:true, created:Date.now()-172800000, popularity:12},
+  {id:'demo-p2', name:'CareConnect Student Health', description:'A multilingual health-resource platform for students and communities.',
+   category:'Healthcare', stage:'Prototype', location:'Chandigarh, India', funding:1500000, equity:10,
+   problem:'People struggle to find basic health resources quickly.',
+   solution:'One simple multilingual discovery and referral platform.',
+   businessModel:'Institutional partnerships', team:'Student health-tech team',
+   ownerId:'demo-owner-2', ownerName:'Aarav Sharma', published:true, created:Date.now()-86400000, popularity:7},
+];
+
+const PROJECT_CATEGORIES = ['Technology','Healthcare','Agriculture','Education','Environment','Finance','Social Impact','Other'];
+const PROJECT_STAGES = ['Idea','Prototype','MVP','Early Revenue','Scaling'];
+/* ---------------------------------------------------------------------- *
+ * NAVIGATION PER ROLE
+ * ---------------------------------------------------------------------- */
+const NAV = {
+  user: [['dashboard','Dashboard'],['profile','Profile'],['projects','My Projects'],['marketplace','Project Marketplace'],
+         ['documents','Documents'],['schemes','Find Schemes'],['readiness','Readiness'],['tools','Funding Tools'],
+         ['partners','Partners'],['applications','Applications'],['connections','Investor Requests'],
+         ['private','Private Channels'],['assistant','AI Assistant']],
+  investor: [['dashboard','Investor Dashboard'],['marketplace','Explore Projects'],['saved','Saved Projects'],
+             ['connections','Connections'],['private','Private Channels'],['assistant','AI Assistant'],['settings','Settings']],
+  partner: [['dashboard','Partner Dashboard'],['marketplace','Relevant Projects'],['connections','Connection Requests'],
+            ['private','Private Channels'],['schemes','Schemes'],['partners','Partners'],['assistant','AI Assistant'],['settings','Settings']],
+  admin: [['dashboard','Dashboard'],['schemes','Schemes'],['partners','Partners'],['users','Users'],['settings','Settings']],
+};
+function navForRole(){ return NAV[session.role] || NAV.user; }
+
+/* ---------------------------------------------------------------------- *
+ * MINIMAL i18n — a curated set of high-visibility strings.
+ * Add more keys here any time; anything missing just falls back to English.
+ * ---------------------------------------------------------------------- */
+const LANG = {
+  en: {}, // English strings are the keys themselves
+  hi: {
+    'Dashboard':'डैशबोर्ड','Profile':'प्रोफ़ाइल','My Projects':'मेरे प्रोजेक्ट','Project Marketplace':'प्रोजेक्ट मार्केटप्लेस',
+    'Documents':'दस्तावेज़','Find Schemes':'योजनाएँ खोजें','Readiness':'तैयारी','Funding Tools':'फंडिंग टूल्स',
+    'Partners':'भागीदार','Applications':'आवेदन','Investor Requests':'निवेशक अनुरोध','Private Channels':'प्राइवेट चैनल',
+    'AI Assistant':'AI सहायक','Investor Dashboard':'निवेशक डैशबोर्ड','Explore Projects':'प्रोजेक्ट देखें',
+    'Saved Projects':'सेव किए गए प्रोजेक्ट','Connections':'कनेक्शन','Settings':'सेटिंग्स','Relevant Projects':'प्रासंगिक प्रोजेक्ट',
+    'Connection Requests':'कनेक्शन अनुरोध','Users':'उपयोगकर्ता','Logout':'लॉगआउट','Save Profile':'प्रोफ़ाइल सेव करें',
+    'Check Readiness':'तैयारी जाँचें','Complete Profile':'प्रोफ़ाइल पूरी करें',
+  },
+  pa: {
+    'Dashboard':'ਡੈਸ਼ਬੋਰਡ','Profile':'ਪ੍ਰੋਫ਼ਾਈਲ','My Projects':'ਮੇਰੇ ਪ੍ਰੋਜੈਕਟ','Project Marketplace':'ਪ੍ਰੋਜੈਕਟ ਮਾਰਕੀਟਪਲੇਸ',
+    'Documents':'ਦਸਤਾਵੇਜ਼','Find Schemes':'ਯੋਜਨਾਵਾਂ ਲੱਭੋ','Readiness':'ਤਿਆਰੀ','Funding Tools':'ਫੰਡਿੰਗ ਟੂਲ',
+    'Partners':'ਭਾਗੀਦਾਰ','Applications':'ਅਰਜ਼ੀਆਂ','Investor Requests':'ਨਿਵੇਸ਼ਕ ਬੇਨਤੀਆਂ','Private Channels':'ਪ੍ਰਾਈਵੇਟ ਚੈਨਲ',
+    'AI Assistant':'AI ਸਹਾਇਕ','Investor Dashboard':'ਨਿਵੇਸ਼ਕ ਡੈਸ਼ਬੋਰਡ','Explore Projects':'ਪ੍ਰੋਜੈਕਟ ਵੇਖੋ',
+    'Saved Projects':'ਸੇਵ ਕੀਤੇ ਪ੍ਰੋਜੈਕਟ','Connections':'ਕਨੈਕਸ਼ਨ','Settings':'ਸੈਟਿੰਗਾਂ','Relevant Projects':'ਸੰਬੰਧਿਤ ਪ੍ਰੋਜੈਕਟ',
+    'Connection Requests':'ਕਨੈਕਸ਼ਨ ਬੇਨਤੀਆਂ','Users':'ਯੂਜ਼ਰ','Logout':'ਲੌਗਆਉਟ','Save Profile':'ਪ੍ਰੋਫ਼ਾਈਲ ਸੇਵ ਕਰੋ',
+    'Check Readiness':'ਤਿਆਰੀ ਚੈੱਕ ਕਰੋ','Complete Profile':'ਪ੍ਰੋਫ਼ਾਈਲ ਪੂਰੀ ਕਰੋ',
+  },
+};
+function tx(s){ const m = LANG[state.lang] || {}; return m[s] !== undefined ? m[s] : s; }
+
+/* ---------------------------------------------------------------------- *
+ * REFERENCE DATA — loaded once from GET /meta (single source of truth on the
+ * server: states, categories, business types/stages, document types, statuses)
+ * ---------------------------------------------------------------------- */
+let META = null;
+const ELIG_LABEL = {eligible:'Eligible', potentially_eligible:'Potentially Eligible', not_eligible:'Not Eligible'};
+const eligPill = s => s === 'eligible' ? 'green' : s === 'not_eligible' ? '' : 'muted';
+const STATUS_ICON = {ok:'\u2705', warn:'\u26a0\ufe0f', bad:'\u274c'};
+function docLabel(slug){ return (META?.document_types || []).find(d => d.type === slug)?.label || slug; }
+function statusLabel(value){ return (META?.application_statuses || []).find(s => s.value === value)?.label || value; }
+function schemeName(id){ return session.schemes.find(s => s.id === id)?.name || id; }
+async function loadMeta(){ if (!META) META = await api('/meta', {auth:false}); }
+
+/* ---------------------------------------------------------------------- *
+ * LOCAL STATE — persisted in localStorage.
+ * Holds ONLY preferences and the frontend-only marketplace data.
+ * Everything else (profile, documents, schemes, partners, applications,
+ * accounts) lives on the server and is fetched on demand.
+ * ---------------------------------------------------------------------- */
+function defaultState(){
+  return {
+    projects: structuredClone(DEFAULT_PROJECTS), investors:[], channelPartners:[],
+    connections:[], messages:[], savedProjects:{}, projectFiles:{},
+    theme:'light', lang:'en',
+  };
+}
+function loadState(){
+  LEGACY_STORAGE_KEYS.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    if (raw && typeof raw === 'object') return {...defaultState(), ...raw};
+  } catch (e) { /* corrupt or unavailable storage -> start clean */ }
+  return defaultState();
+}
+let state = loadState();
+function persist(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
+
+/* transient (never persisted): who is signed in + data fetched from the API */
+let session = { role:'user', selectedRole:'user', page:'dashboard', user:null, profile:{}, schemes:[], matches:[], partners:[], partnerNear:null, chat:[] };
+
+/* ---------------------------------------------------------------------- *
+ * UTILITIES
+ * ---------------------------------------------------------------------- */
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function money(n){ return '\u20B9' + Number(n || 0).toLocaleString('en-IN'); }
+function me(){ return session.user?.id || ''; }              // opaque user_id — never an e-mail address
+function safeUrl(u){ return /^https?:\/\//i.test(u || '') ? u : '#'; }
+function fmtDate(iso){ const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-IN'); }
+function toast(t, ms = 2400){
+  const el = $('toast');
+  el.textContent = t; el.style.display = 'block';
+  clearTimeout(toast._t); toast._t = setTimeout(() => el.style.display = 'none', ms);
+}
+function v(id){ return $(id)?.value ?? ''; }                  // raw element id
+function fv(name){ return v('f-' + name); }                    // inputs built by field()/select() have id="f-<name>"
+function closeModal(){ $('modal').classList.remove('show'); }
+function openModal(html){ $('modalbox').innerHTML = html; $('modal').classList.add('show'); }
+function setBusy(id, on){ const el = $(id); if (el) el.disabled = !!on; }
+function debounce(fn, ms = 300){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function numOr(name, dflt){                                    // number from a field(); blank/invalid -> default
+  const raw = fv(name).trim();
+  if (raw === '') return dflt;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : dflt;
+}
+function showError(e){
+  console.error(e);
+  if (e && e.status === 401) return;                          // already handled by the session-expiry flow
+  toast(e?.message || 'Something went wrong. Please try again.', 4000);
+}
+const LOADING = '<div class="empty">Loading\u2026</div>';
+
+function donut(pct, size, ringColorVar){
+  ringColorVar = ringColorVar || (pct >= 70 ? '--banyan' : pct >= 40 ? '--marigold' : '--rust');
+  return `<div class="donut-wrap" style="width:${size}px;height:${size}px">
+    <div class="donut-ring" style="--pct:${pct};--ring-color:var(${ringColorVar})">
+      <div class="donut-inner"><b>${pct}</b><span>/ 100</span></div>
+    </div>
+  </div>`;
+}
+
+/* Form helpers. Inputs get id="f-<id>" — read them back with fv('<id>').
+   `opts` for select() may be plain strings or [value, label] pairs. */
+function field(label, id, val, type='text', ph='', min='', max=''){
+  const numeric = type === 'number';
+  const safe = numeric && Number(val) < 0 ? '' : (val ?? '');
+  const minV = min !== '' ? min : (numeric ? '0' : '');
+  return `<div><label for="f-${id}">${label}</label><input id="f-${id}" class="field" type="${type}" value="${esc(safe)}" placeholder="${esc(ph)}"
+    ${numeric ? `step="any" inputmode="decimal" oninput="sanitizeNumber(this)" onblur="sanitizeNumber(this)"` : ''}
+    ${minV !== '' ? `min="${minV}"` : ''} ${max !== '' ? `max="${max}"` : ''}></div>`;
+}
+function select(label, id, val, opts){
+  const pairs = opts.map(o => Array.isArray(o) ? o : [o, o]);
+  return `<div><label for="f-${id}">${label}</label><select id="f-${id}" class="field"><option value="">Select</option>
+    ${pairs.map(([value, text]) => `<option value="${esc(value)}" ${value === val ? 'selected' : ''}>${esc(text)}</option>`).join('')}</select></div>`;
+}
+function checkGroup(label, name, opts, selected){
+  return `<div class="full"><label>${label}</label><div class="checkgroup" data-group="${name}">
+    ${opts.map(([value, text]) => `<label class="check"><input type="checkbox" value="${esc(value)}" ${selected.includes(value) ? 'checked' : ''}> ${esc(text)}</label>`).join('')}</div></div>`;
+}
+function checkedValues(name){ return [...document.querySelectorAll(`.checkgroup[data-group="${name}"] input:checked`)].map(i => i.value); }
+function sanitizeNumber(el){
+  if (!el || el.type !== 'number') return;
+  let val = String(el.value || '').replace(/[^0-9.]/g, '');
+  const parts = val.split('.');
+  if (parts.length > 2) val = parts.shift() + '.' + parts.join('');
+  if (val !== '' && Number(val) < 0) val = '0';
+  const max = el.getAttribute('max');
+  if (max !== null && val !== '' && Number(val) > Number(max)) val = max;
+  el.value = val;
+}
+
+/* ---------------------------------------------------------------------- *
+ * API CLIENT
+ *   JSON for normal data, FormData for uploads (the browser sets the multipart
+ *   boundary itself — never set Content-Type by hand for FormData).
+ * ---------------------------------------------------------------------- */
+class ApiError extends Error { constructor(status, message){ super(message); this.status = status; } }
+
+function apiMessage(data, fallback){
+  const d = data && data.detail;
+  if (typeof d === 'string') return d;
+  if (Array.isArray(d) && d.length) {                          // FastAPI validation errors
+    return d.slice(0, 2).map(e => {
+      const where = (e.loc || []).filter(x => x !== 'body' && x !== 'query').join('.');
+      const msg = String(e.msg || 'Invalid value').replace(/^Value error, /, '');
+      return where ? `${where}: ${msg}` : msg;
+    }).join('; ');
+  }
+  return fallback;
+}
+function getToken(){ return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY); }
+function setToken(token, remember){ clearToken(); (remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, token); }
+function clearToken(){ sessionStorage.removeItem(TOKEN_KEY); localStorage.removeItem(TOKEN_KEY); }
+
+async function api(path, opts = {}){
+  const {method = 'GET', body, form, auth = true, raw = false} = opts;
+  const headers = {};
+  const token = auth ? getToken() : null;
+  if (token) headers.Authorization = 'Bearer ' + token;
+  let payload;
+  if (form) payload = form;
+  else if (body !== undefined) { headers['Content-Type'] = 'application/json'; payload = JSON.stringify(body); }
+
+  let res;
+  try { res = await fetch(API_BASE + path, {method, headers, body: payload}); }
+  catch (e) { throw new ApiError(0, 'Cannot reach the server. Please check that the backend is running.'); }
+
+  if (res.status === 401 && auth) { handleSessionExpired(); throw new ApiError(401, 'Your session has expired. Please log in again.'); }
+  if (raw) {
+    if (!res.ok) throw new ApiError(res.status, apiMessage(await res.json().catch(() => null), `Request failed (${res.status})`));
+    return res;
+  }
+  const data = res.status === 204 ? null : await res.json().catch(() => null);
+  if (!res.ok) throw new ApiError(res.status, apiMessage(data, `Request failed (${res.status})`));
+  return data;
+}
+
+/* ---------------------------------------------------------------------- *
+ * AUTH — handled entirely by the backend (bcrypt hashes, signed tokens)
+ * ---------------------------------------------------------------------- */
+function togglePass(id, btn){
+  const inp = $(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? 'Show' : 'Hide';
+}
+let registerFormShownAt = 0;
+function showRegister(){
+  $('registerPanel').classList.remove('hidden');
+  $('loginError').textContent = '';
+  registerFormShownAt = Date.now();
+}
+function hideRegister(){ $('registerPanel').classList.add('hidden'); $('registerError').textContent = ''; }
+
+function roleLabel(r){ return {user:'Entrepreneur / Student', investor:'Investor', partner:'Private Channel Partner', admin:'Admin'}[r] || 'Entrepreneur / Student'; }
+
+function setRole(r){
+  session.selectedRole = r;
+  ['roleUser','roleInvestor','rolePartner','roleAdmin'].forEach(id => $(id)?.classList.remove('active'));
+  const idMap = {user:'roleUser', investor:'roleInvestor', partner:'rolePartner', admin:'roleAdmin'};
+  $(idMap[r])?.classList.add('active');
+  const creds = DEMO.enabled
+    ? {user:[DEMO.email, DEMO.password], admin:[DEMO.adminEmail, ''], investor:['', ''], partner:['', '']}[r]
+    : ['', ''];
+  $('loginEmail').value = creds[0];
+  $('loginPass').value = creds[1];
+}
+
+async function createAccount(){
+  const role = v('regRole'), name = v('regName').trim(), email = v('regEmail').trim().toLowerCase();
+  const pass = v('regPass'), confirm = v('regConfirm');
+  const err = $('registerError');
+  err.textContent = '';
+
+  /* Spam protection #1 — honeypot: a hidden field no human sees or fills. */
+  if (v('regWebsite')) { console.warn('Registration blocked: honeypot field was filled.'); return; }
+  /* Spam protection #2 — minimum fill time (server-side login throttling is the real defence). */
+  if (Date.now() - registerFormShownAt < 1500) { err.textContent = 'That was fast! Please review the form and submit again.'; return; }
+
+  if (!name || !email || !pass) { err.textContent = 'Please fill all fields.'; return; }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Enter a valid email.'; return; }
+  if (pass.length < 8) { err.textContent = 'Password must be at least 8 characters.'; return; }
+  if (pass !== confirm) { err.textContent = 'Passwords do not match.'; return; }
+
+  setBusy('registerBtn', true);
+  try {
+    await api('/auth/register', {method:'POST', auth:false, body:{full_name:name, email, password:pass, role}});
+  } catch (e) { err.textContent = e.message; return; }
+  finally { setBusy('registerBtn', false); }
+
+  setRole(role);
+  $('loginEmail').value = email;
+  $('loginPass').value = pass;
+  hideRegister();
+  toast('Account created successfully — you can log in now');
+}
+
+async function login(){
+  const email = v('loginEmail').trim().toLowerCase(), pass = v('loginPass');
+  const err = $('loginError');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Enter your email and password.'; return; }
+  setBusy('loginBtn', true);
+  try {
+    const res = await api('/auth/login', {method:'POST', auth:false, body:{email, password:pass}});
+    setToken(res.access_token, $('remember').checked);
+    await startSession(res.user);
+  } catch (e) {
+    clearToken();
+    err.textContent = e.status === 401 ? 'Invalid email or password.' : e.message;
+  } finally { setBusy('loginBtn', false); }
+}
+
+/* Load what the signed-in user needs, then show the app. */
+async function startSession(user){
+  session.user = user;
+  session.role = user.role;
+  session.profile = {};
+  session.chat = [];
+  session.partnerNear = null;
+  try {
+    await loadMeta();
+    session.schemes = await api('/schemes');
+    if (user.role === 'user') session.profile = await api('/profile');
+  } catch (e) { session.user = null; throw e; }
+  ensureRoleProfile(user);
+  showApp();
+}
+async function restoreSession(){
+  if (!getToken()) return;
+  try { await startSession(await api('/auth/me')); }
+  catch (e) { if (e.status === 0) $('loginError').textContent = e.message; }
+}
+
+/* Marketplace-only (frontend-side) records for investors / channel partners, keyed by user_id. */
+function ensureRoleProfile(user){
+  if (user.role === 'investor' && !state.investors.some(x => x.userId === user.id))
+    state.investors.push({userId:user.id, name:user.full_name, organization:user.full_name, categories:'Technology', stages:'MVP', range:'', location:'', description:''});
+  if (user.role === 'partner' && !state.channelPartners.some(x => x.userId === user.id))
+    state.channelPartners.push({userId:user.id, name:user.full_name, contact:user.full_name, phone:'', state:'', type:'Bank', services:'Funding support', supported:'PMEGP, MUDRA'});
+  persist();
+}
+
+function handleSessionExpired(){
+  clearToken();
+  if (!session.user) return;                                   // already signed out
+  toast('Your session has expired. Please log in again.', 4000);
+  logout();
+}
+function logout(){
+  clearToken();
+  session.user = null; session.role = 'user'; session.profile = {}; session.schemes = []; session.matches = [];
+  session.partners = []; session.partnerNear = null; session.chat = [];
+  $('app').classList.remove('active');
+  $('login').style.display = 'grid';
+  closeModal();
+  setRole(session.selectedRole || 'user');                     // re-applies the demo prefill only when DEMO.enabled
+  if (!DEMO.enabled) $('loginPass').value = '';
+}
+
+function showApp(){
+  $('login').style.display = 'none';
+  $('app').classList.add('active');
+  $('theme').value = state.theme;
+  $('lang').value = state.lang;
+  applyTheme();
+  renderNav();
+  renderPages();
+  go('dashboard');
+}
+function applyTheme(){ document.body.className = state.theme === 'dark' ? 'dark' : ''; }
+function changeTheme(val){ state.theme = val; persist(); applyTheme(); }
+function changeLang(val){
+  if (!['en','hi','pa'].includes(val)) val = 'en';
+  state.lang = val; persist();
+  renderNav(); renderPages(); go(session.page || 'dashboard');
+}
+
+window.addEventListener('load', async () => {
+  const logoutBtn = $('logoutBtn');
+  if (logoutBtn) logoutBtn.innerHTML = icon('logout') + '<span>Logout</span>';
+  const yr = $('yr'); if (yr) yr.textContent = new Date().getFullYear();
+  applyTheme();
+  setRole('user');
+  initCookieConsent();
+  registerFormShownAt = Date.now();
+  await restoreSession();
+});
+
+/* ---------------------------------------------------------------------- *
+ * "TRY THE DEMO" — single clear call-to-action on the landing/login screen
+ * ---------------------------------------------------------------------- */
+function quickDemoLogin(){
+  if (!DEMO.enabled) { toast('The demo account is disabled on this deployment.'); return; }
+  setRole('user');
+  login();
+}
+
+/* ---------------------------------------------------------------------- *
+ * SHELL / NAVIGATION
+ * ---------------------------------------------------------------------- */
+function renderNav(){
+  const items = navForRole();
+  $('nav').innerHTML = items.map(([id, label]) => `
+    <button onclick="go('${id}')" class="${session.page === id ? 'active' : ''}">
+      ${icon(id)}<span>${tx(label)}</span>
+    </button>`).join('');
+}
+function renderPages(){
+  const items = navForRole();
+  $('pages').innerHTML = items.map(([id]) => `<div id="p-${id}" class="page"></div>`).join('');
+  items.forEach(([id]) => renderPageShell(id));
+}
+function go(id){
+  session.page = id;
+  renderNav();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = $('p-' + id);
+  if (!el) return;
+  el.classList.add('active');
+  const found = navForRole().find(x => x[0] === id);
+  $('topTitle').textContent = tx(found ? found[1] : id);
+  renderPageData(id);
+}
+function renderPageShell(id){
+  const el = $('p-' + id);
+  if (!el) return;
+  const map = {
+    dashboard: () => session.role === 'investor' ? investorDashHTML() : session.role === 'partner' ? partnerDashHTML() : session.role === 'admin' ? adminDashHTML() : dashboardHTML(),
+    profile: profileHTML, documents: documentsHTML, schemes: schemesHTML, readiness: readinessHTML,
+    tools: toolsHTML, partners: partnersHTML, applications: appsHTML, assistant: assistantHTML,
+    users: usersHTML, settings: settingsHTML, marketplace: marketplaceHTML, projects: projectsHTML,
+    saved: savedHTML, connections: connectionsHTML, private: privateHTML,
+  };
+  if (map[id]) el.innerHTML = map[id]();
+}
+/* Page data loaders may be async (API calls); failures are reported, never thrown into the void. */
+function renderPageData(id){
+  const map = {
+    dashboard: () => session.role === 'investor' ? renderInvestorDash() : session.role === 'partner' ? renderPartnerDash() : session.role === 'admin' ? renderAdminDash() : updateDashboard(),
+    profile: loadProfile, documents: renderDocs, schemes: renderSchemePage, readiness: renderReadiness,
+    tools: renderTools, partners: renderPartnerPage, applications: renderApps,
+    assistant: renderChat, users: renderUsers, marketplace: renderMarketplace, projects: renderProjects,
+    saved: renderSaved, connections: renderConnections, private: renderPrivate, settings: () => {},
+  };
+  if (map[id]) Promise.resolve().then(map[id]).catch(showError);
+}
+
+/* ---------------------------------------------------------------------- *
+ * COOKIE CONSENT + ANALYTICS
+ * Consent is stored in an actual cookie (not just localStorage) so it is
+ * genuinely "cookie" consent as required by most cookie-law banners.
+ * Analytics is only ever loaded after an explicit Accept.
+ * ---------------------------------------------------------------------- */
+function setCookie(name, value, days){
+  const d = new Date(); d.setTime(d.getTime() + days*24*60*60*1000);
+  document.cookie = `${name}=${value}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
+}
+function getCookie(name){
+  return document.cookie.split('; ').reduce((acc, c) => {
+    const [k, v] = c.split('=');
+    return k === name ? v : acc;
+  }, null);
+}
+function initCookieConsent(){
+  const consent = getCookie('udyamCookieConsent');
+  if (consent === 'accepted') { loadAnalytics(); return; }
+  if (consent === 'declined') return;
+  document.getElementById('cookiebar')?.classList.remove('hidden');
+}
+function setCookieConsent(accepted){
+  setCookie('udyamCookieConsent', accepted ? 'accepted' : 'declined', 180);
+  document.getElementById('cookiebar')?.classList.add('hidden');
+  if (accepted) loadAnalytics();
+}
+let analyticsLoaded = false;
+function loadAnalytics(){
+  if (analyticsLoaded) return;
+  analyticsLoaded = true;
+  /* Replace G-XXXXXXXXXX with your real GA4 Measurement ID before deploying.
+     Loaded dynamically (not as a static <script> tag) so it only ever runs
+     after the user has accepted the cookie banner. */
+  const GA_ID = 'G-XXXXXXXXXX';
+  const s = document.createElement('script');
+  s.async = true; s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+}
+
+/* ---------------------------------------------------------------------- *
+ * DASHBOARD — Entrepreneur / Student
+ * Scoring, matching and the readiness breakdown are computed by the backend
+ * (GET /readiness) — this page only renders the result.
+ * ---------------------------------------------------------------------- */
+function greetingName(){ return session.user?.full_name || session.profile?.full_name || ''; }
+function dashboardHTML(){
+  const name = greetingName();
+  return `
+  <div class="greeting-row">
+    <div><h1>${name ? 'Namaste, ' + esc(name) : 'Welcome to Udyam-Nirdesh'}</h1>
+      <div class="muted">Your funding journey, simplified.</div></div>
+    <button class="btn" onclick="go('profile')">${icon('profile')} Complete profile</button>
+  </div>
+
+  <div class="hero">
+    <div id="d-donut"></div>
+    <div class="hero-side">
+      <div class="eyebrow">Funding readiness</div>
+      <div class="hero-scheme">
+        <div id="d-match-pill">&mdash;</div>
+        <h3 id="d-best">&mdash;</h3>
+        <p class="muted" id="d-best-desc" style="margin:0"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid metric-row">
+    <div class="metric-card"><div class="label">Eligibility match</div><div class="value" id="d-elig">&mdash;</div><div class="sub">of 30 points</div></div>
+    <div class="metric-card"><div class="label">Document readiness</div><div class="value" id="d-docs">&mdash;</div><div class="sub">of 20 points</div></div>
+    <div class="metric-card"><div class="label">Financial readiness</div><div class="value" id="d-fin">&mdash;</div><div class="sub">of 20 points</div></div>
+    <div class="metric-card"><div class="label">Business readiness</div><div class="value" id="d-biz">&mdash;</div><div class="sub">of 20 points</div></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="ledger">
+      <div style="padding:14px 16px 0"><h3 style="font-size:16px">Continue your journey</h3></div>
+      <div class="journey-list" style="margin-top:10px">
+        <div class="journey-item"><span class="journey-num">1</span><div><b>Complete profile</b><small>Tell us about you</small></div><button class="btn small secondary" onclick="go('profile')">Open</button></div>
+        <div class="journey-item"><span class="journey-num">2</span><div><b>Upload documents</b><small>Build your file set</small></div><button class="btn small secondary" onclick="go('documents')">Open</button></div>
+        <div class="journey-item"><span class="journey-num">3</span><div><b>Check readiness</b><small>Find gaps</small></div><button class="btn small secondary" onclick="go('readiness')">Open</button></div>
+        <div class="journey-item"><span class="journey-num">4</span><div><b>Compare schemes</b><small>See matches</small></div><button class="btn small secondary" onclick="go('schemes')">Open</button></div>
+        <div class="journey-item"><span class="journey-num">5</span><div><b>Apply</b><small>Track progress</small></div><button class="btn small secondary" onclick="go('applications')">Open</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px; margin-bottom:10px">Next recommended action</h3>
+      <p class="muted" id="d-next" style="margin:0">Complete your profile to unlock personalised guidance.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="font-size:16px; margin-bottom:12px">How it works</h3>
+    <div class="pipeline">
+      ${['User input','Profile creation','Document processing','Eligibility analysis','Scheme matching','Readiness score','Action plan']
+        .map((x, i) => `<div class="step"><b>${i+1}. ${x}</b><small>Step ${i+1} of 7</small></div>`).join('')}
+    </div>
+  </div>`;
+}
+async function updateDashboard(){
+  const r = await api('/readiness');
+  if (!$('d-donut')) return;                                   // user navigated away meanwhile
+  const top = r.top_scheme;
+  const cat = k => r.categories.find(c => c.key === k);
+  const pts = k => `${cat(k)?.score ?? 0}/${cat(k)?.max_score ?? 0}`;
+
+  $('d-donut').innerHTML = donut(r.overall, 170);
+  $('d-match-pill').innerHTML = top
+    ? `<span class="pill ${eligPill(top.eligibility_status)}">${ELIG_LABEL[top.eligibility_status]}</span> <span class="muted" style="font-size:11.5px">${top.match_pct}% of checks pass</span>`
+    : 'No schemes yet';
+  $('d-best').textContent = top?.name || 'Add schemes to compare';
+  $('d-best-desc').textContent = top?.description || '';
+  $('d-elig').textContent = pts('eligibility');
+  $('d-docs').textContent = pts('documents');
+  $('d-fin').textContent = pts('financial');
+  $('d-biz').textContent = pts('business');
+  const gap = r.gaps.find(g => g.status === 'bad') || r.gaps[0];
+  $('d-next').textContent = gap
+    ? (gap.action || gap.text)
+    : (top ? `You look ready \u2014 review ${top.name} and apply on the official portal.` : 'Ask an admin to add a scheme.');
+}
+
+/* ---------------------------------------------------------------------- *
+ * PROFILE  (GET/PUT /profile) — snake_case keys, real numbers
+ * ---------------------------------------------------------------------- */
+const PROFILE_FIELDS = {          // key -> how to convert the input value before sending
+  full_name:'text', age:'int', gender:'text', state:'text', district:'text', category:'text', occupation:'text',
+  business_type:'text', business_stage:'text', annual_income:'float', annual_turnover:'float',
+  funding_required:'float', own_contribution:'float', funding_purpose:'text',
+};
+function profileHTML(){
+  const p = session.profile || {};
+  return `
+  <div class="title"><div><h1>${tx('Profile')}</h1><div class="muted">Your profile powers matching, readiness and funding tools.</div></div>
+    <span class="pill muted">Saved to your account</span></div>
+  <div class="card"><div class="formgrid">
+    ${field('Full name','full_name',p.full_name,'text','e.g. Aman Kumar')}
+    ${field('Age','age',p.age,'number','18+','18','120')}
+    ${select('Gender','gender',p.gender,META.genders)}
+    ${select('State/UT','state',p.state,META.states)}
+    ${field('District','district',p.district,'text','District')}
+    ${select('Social category','category',p.category,META.categories)}
+    ${field('Occupation','occupation',p.occupation,'text','Occupation')}
+    ${select('Business type','business_type',p.business_type,META.business_types)}
+    ${select('Business stage','business_stage',p.business_stage,META.business_stages)}
+    ${field('Annual family income','annual_income',p.annual_income,'number','\u20B9',0,10000000000)}
+    ${field('Annual turnover','annual_turnover',p.annual_turnover,'number','\u20B9','0','1000000000')}
+    ${field('Funding required','funding_required',p.funding_required,'number','\u20B9',0,100000000000)}
+    ${field('Own contribution (margin money) available','own_contribution',p.own_contribution,'number','\u20B9',0,100000000000)}
+    ${field('Funding purpose','funding_purpose',p.funding_purpose,'text','Equipment / working capital / expansion')}
+  </div>
+  <p class="muted" style="font-size:12px; margin-top:10px">Prototype \u2014 verify the latest eligibility criteria and margin-money norms on the official scheme portal before applying.</p>
+  <div class="actions" style="display:flex; gap:8px; margin-top:16px">
+    <button id="saveProfileBtn" class="btn" onclick="saveProfile()">${tx('Save Profile')}</button>
+    <button class="btn secondary" onclick="go('readiness')">${tx('Check Readiness')}</button>
+  </div></div>`;
+}
+function loadProfile(){
+  const p = session.profile || {};
+  Object.keys(PROFILE_FIELDS).forEach(k => { const el = $('f-' + k); if (el) el.value = p[k] ?? ''; });
+}
+/* Build the API payload with real types: age -> int, money -> number, blank -> null. */
+function profilePayload(){
+  const payload = {};
+  for (const [key, kind] of Object.entries(PROFILE_FIELDS)) {
+    const el = $('f-' + key);
+    if (!el) continue;
+    if (el.type === 'number') sanitizeNumber(el);
+    const raw = String(el.value ?? '').trim();
+    payload[key] = raw === '' ? null : kind === 'int' ? parseInt(raw, 10) : kind === 'float' ? Number(raw) : raw;
+  }
+  return payload;
+}
+async function saveProfile(){
+  const payload = profilePayload();
+  if (!Number.isInteger(payload.age) || payload.age < 18 || payload.age > 120) { toast('Age must be between 18 and 120'); return; }
+  setBusy('saveProfileBtn', true);
+  try {
+    session.profile = await api('/profile', {method:'PUT', body:payload});
+  } catch (e) { showError(e); return; }
+  finally { setBusy('saveProfileBtn', false); }
+  toast('Profile saved');
+  renderPageShell('dashboard'); renderPageShell('tools');      // refresh pages that show profile-derived defaults
+  go('dashboard');
+}
+
+/* ---------------------------------------------------------------------- *
+ * DOCUMENTS  (GET /documents · POST /documents/upload · GET /documents/{id}/file · DELETE)
+ * Files are uploaded as multipart/form-data and stored on the server;
+ * the browser keeps only ids — never the file contents.
+ * ---------------------------------------------------------------------- */
+function documentsHTML(){
+  return `
+  <div class="title"><div><h1>${tx('Documents')}</h1><div class="muted">Files are uploaded to the server (PDF, PNG, JPG or text, up to 5 MB) and are only visible to you.</div></div>
+    <span id="docPct" class="pill">0% complete</span></div>
+  <div class="card"><div class="progress"><span id="docBar" style="width:0"></span></div>
+  <div id="docList" class="ledger" style="margin-top:15px">${LOADING}</div></div>`;
+}
+async function renderDocs(){
+  const data = await api('/documents');
+  const box = $('docList'); if (!box) return;
+  box.innerHTML = data.documents.map(d => {
+    const up = d.status === 'uploaded';
+    return `<div class="ledger-row ${up ? 'tone-good' : 'tone-warn'}">
+      <div><b>${esc(d.label)}</b><div class="muted" style="font-size:11.5px">${up ? esc(d.filename) : 'Missing'}</div></div>
+      <div style="display:flex; gap:7px; flex-wrap:wrap">
+        <label class="btn small secondary" style="margin:0">${up ? 'Replace' : 'Upload'}<input type="file" hidden accept=".pdf,.png,.jpg,.jpeg,.txt" onchange="uploadDoc('${d.type}',this)"></label>
+        ${up ? `<button class="btn small secondary" onclick="viewDoc('${d.document_id}')">View</button><button class="btn small danger" onclick="removeDoc('${d.document_id}')">Remove</button>` : ''}
+      </div></div>`;
+  }).join('');
+  $('docPct').textContent = data.completion_pct + '% complete';
+  $('docBar').style.width = data.completion_pct + '%';
+}
+async function uploadDoc(type, input){
+  const file = input.files[0]; if (!file) return;
+  if (file.size > MAX_UPLOAD_BYTES) { toast('File is too large (max 5 MB)'); input.value = ''; return; }
+  const form = new FormData();
+  form.append('document_type', type);
+  form.append('file', file);
+  try {
+    await api('/documents/upload', {method:'POST', form});
+    toast(docLabel(type) + ' uploaded');
+  } catch (e) { showError(e); }
+  input.value = '';
+  await renderDocs().catch(showError);
+}
+async function viewDoc(id){
+  const w = window.open('', '_blank');                         // open synchronously so pop-up blockers allow it
+  if (!w) { toast('Please allow pop-ups to view the document.'); return; }
+  try {
+    const res = await api(`/documents/${id}/file`, {raw:true}); // sends the Authorization header, unlike a plain link
+    const url = URL.createObjectURL(await res.blob());
+    w.location = url;
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  } catch (e) { w.close(); showError(e); }
+}
+async function removeDoc(id){
+  try { await api(`/documents/${id}`, {method:'DELETE'}); toast('Document removed'); }
+  catch (e) { showError(e); }
+  await renderDocs().catch(showError);
+}
+
+/* ---------------------------------------------------------------------- *
+ * SCHEMES  (find + admin management)
+ *   users : GET /schemes/matches  -> every scheme classified against their profile
+ *   others: GET /schemes          -> plain list (no profile to match against)
+ * ---------------------------------------------------------------------- */
+function schemesHTML(){
+  const isAdmin = session.role === 'admin';
+  return `
+  <div class="title"><div><h1>${isAdmin ? 'Scheme management' : tx('Find Schemes')}</h1>
+    <div class="muted">${isAdmin ? 'Add, edit and remove schemes.' : 'Rule-based eligibility matching against your current profile \u2014 not the LLM.'}</div></div>
+    ${isAdmin ? `<button class="btn" onclick="schemeModal()">+ Add scheme</button>` : ''}</div>
+  ${isAdmin ? '' : `<p class="muted" style="font-size:12px; margin:-8px 0 16px">Prototype \u2014 verify the latest eligibility criteria and application details on the official government portal.</p>`}
+  <div class="filters">
+    <input id="schemeSearch" class="field" placeholder="Search scheme..." oninput="renderSchemes()">
+    <select id="catFilter" class="field" onchange="renderSchemes()"><option value="">All categories</option>
+      ${META.categories.map(x => `<option>${esc(x)}</option>`).join('')}</select>
+    <select id="typeFilter" class="field" onchange="renderSchemes()"><option value="">All business types</option>
+      ${META.business_types.map(x => `<option>${esc(x)}</option>`).join('')}</select>
+    <input id="fundFilter" class="field" type="number" placeholder="Funding needed \u20B9" oninput="renderSchemes()">
+  </div>
+  <div id="schemeList" class="schemegrid">${LOADING}</div>`;
+}
+async function renderSchemePage(){
+  if (session.role === 'user') {
+    session.matches = await api('/schemes/matches');
+    session.schemes = session.matches.map(m => m.scheme);
+  } else {
+    session.schemes = await api('/schemes');
+    session.matches = session.schemes.map(s => ({scheme:s, eligibility_status:null, match_pct:null, checks:[]}));
+  }
+  renderSchemes();
+}
+function renderSchemes(){                                       // client-side filtering of the loaded list
+  const box = $('schemeList'); if (!box) return;
+  const q = v('schemeSearch').toLowerCase(), cat = v('catFilter'), type = v('typeFilter'), fund = +v('fundFilter') || 0;
+  const isAdmin = session.role === 'admin';
+  const list = session.matches.filter(({scheme:s}) =>
+    `${s.name} ${s.full_name} ${s.description}`.toLowerCase().includes(q) &&
+    (!cat || s.eligible_categories.includes(cat)) && (!type || s.business_types.includes(type)) && (!fund || fund <= s.max_amount));
+  box.innerHTML = list.length ? list.map(({scheme:s, eligibility_status:st, match_pct:pct, checks}) => `
+    <div class="scheme-card">
+      ${st ? `<span class="pill ${eligPill(st)}">${ELIG_LABEL[st]}</span><span class="muted" style="font-size:11px"> \u00b7 ${pct}% of checks pass</span>` : ''}
+      <h3>${esc(s.name)}</h3><div class="muted" style="font-size:12.5px">${esc(s.full_name)}</div>
+      <p style="font-size:13px">${esc(s.description)}</p>
+      <div class="amount">${money(s.min_amount)} \u2013 ${money(s.max_amount)}</div>
+      <div class="muted" style="font-size:11px; margin-bottom:6px">${esc(s.scheme_type)} \u00b7 Purpose: ${esc(s.purpose || '\u2014')}</div>
+      ${checks.length ? `<div class="why"><b>Why this scheme?</b><br>${checks.map(x => `${STATUS_ICON[x.status]} ${esc(x.text)}`).join('<br>')}</div>` : ''}
+      <details style="margin-top:10px"><summary><b>Eligibility & documents</b></summary>
+        <p style="font-size:12.5px"><b>Business:</b> ${esc(s.business_types.join(', '))}<br><b>Stages:</b> ${esc(s.business_stages.join(', '))}<br><b>Min. age:</b> ${s.min_age}<br>
+        <b>Income limit:</b> ${s.max_income == null ? 'None' : money(s.max_income)}<br><b>Own contribution:</b> ~${Math.round(s.own_contribution_pct * 100)}%<br>
+        <b>Education:</b> ${esc(s.education || 'Not specified')}<br><b>Interest rate:</b> ${esc(s.interest_rate || 'Varies \u2014 check official portal')}<br>
+        <b>Docs:</b> ${esc(s.required_documents.map(docLabel).join(', '))}<br><b>How to apply:</b> ${esc(s.application_channel || 'See official portal')}</p>
+        <p style="font-size:12.5px"><b>Benefits:</b> ${esc(s.benefits)}</p><p class="muted" style="font-size:11.5px">Source: ${esc(s.source)} \u2014 verify on the official portal before applying.</p></details>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px">
+        <a class="btn small" target="_blank" rel="noopener noreferrer" href="${esc(safeUrl(s.official_url))}">Official apply \u2197</a>
+        ${isAdmin ? `<button class="btn small secondary" onclick="schemeModal('${esc(s.id)}')">Edit</button><button class="btn small danger" onclick="deleteScheme('${esc(s.id)}')">Delete</button>` : ''}
+      </div></div>`).join('') : `<div class="empty" style="grid-column:1/-1">No schemes match the current filters.</div>`;
+}
+
+/* Admin form: covers EVERY field of the fixed Scheme schema (the old form silently dropped several). */
+function schemeModal(id){
+  const existing = id ? session.schemes.find(x => x.id === id) : null;
+  const s = existing || {name:'', full_name:'', scheme_type:'', description:'', min_amount:1000, max_amount:100000, min_age:18,
+    max_income:null, education:'', purpose:'', interest_rate:'', own_contribution_pct:0.10, application_channel:'',
+    required_documents:['identity_proof','pan','bank_statement','project_report'], benefits:'', source:'',
+    official_url:'https://www.jansamarth.in/', eligible_categories:[...META.categories], business_types:[...META.business_types], business_stages:[...META.business_stages]};
+  openModal(`<h2 style="font-family:'Fraunces',serif; margin-bottom:14px">${existing ? 'Edit' : 'Add'} scheme</h2>
+    <div class="formgrid">
+      ${field('Name','msName',s.name)}${field('Full name','msFull',s.full_name)}${field('Type','msType',s.scheme_type)}
+      ${field('Minimum funding','msMin',s.min_amount,'number')}${field('Maximum funding','msMax',s.max_amount,'number')}${field('Official URL','msUrl',s.official_url)}
+      ${field('Minimum age','msAge',s.min_age,'number','18','0','120')}${field('Income limit (blank = none)','msIncome',s.max_income,'number','\u20B9')}
+      ${field('Own contribution required (%)','msOwn',Math.round(s.own_contribution_pct * 1000) / 10,'number','%','0','100')}
+      <div class="full">${field('Description','msDesc',s.description)}</div>
+      <div class="full">${field('Benefits','msBenefits',s.benefits)}</div>
+      <div class="full">${field('Purpose','msPurpose',s.purpose)}</div>
+      ${field('Education requirement','msEdu',s.education)}${field('Interest rate (text)','msRate',s.interest_rate)}${field('Source','msSource',s.source)}
+      <div class="full">${field('How to apply (channel)','msChannel',s.application_channel)}</div>
+      ${checkGroup('Eligible categories','cats',META.categories.map(x => [x, x]),s.eligible_categories)}
+      ${checkGroup('Business types','types',META.business_types.map(x => [x, x]),s.business_types)}
+      ${checkGroup('Business stages','stages',META.business_stages.map(x => [x, x]),s.business_stages)}
+      ${checkGroup('Required documents','docs',META.document_types.map(d => [d.type, d.label]),s.required_documents)}
+    </div>
+    <div style="display:flex; gap:8px; margin-top:16px">
+      <button id="saveSchemeBtn" class="btn" onclick="saveScheme('${existing ? esc(s.id) : ''}')">Save</button>
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+    </div>`);
+}
+async function saveScheme(id){
+  if (!fv('msName').trim()) { toast('Scheme name is required'); return; }
+  if (!/^https?:\/\//i.test(fv('msUrl').trim())) { toast('A valid official URL (starting with http:// or https://) is required'); return; }
+  const min = numOr('msMin', 0), max = numOr('msMax', 0);
+  if (min > max) { toast('Minimum funding cannot exceed maximum funding'); return; }
+  const income = fv('msIncome').trim();
+  const body = {
+    name: fv('msName').trim(), full_name: fv('msFull').trim(), scheme_type: fv('msType').trim(), description: fv('msDesc').trim(),
+    min_amount: min, max_amount: max, min_age: numOr('msAge', 18), max_income: income === '' ? null : Number(income),
+    education: fv('msEdu').trim(), purpose: fv('msPurpose').trim(), interest_rate: fv('msRate').trim(),
+    own_contribution_pct: numOr('msOwn', 10) / 100, application_channel: fv('msChannel').trim(),
+    benefits: fv('msBenefits').trim(), source: fv('msSource').trim(), official_url: fv('msUrl').trim(),
+    eligible_categories: checkedValues('cats'), business_types: checkedValues('types'),
+    business_stages: checkedValues('stages'), required_documents: checkedValues('docs'),
+  };
+  if (!body.eligible_categories.length || !body.business_types.length || !body.business_stages.length) {
+    toast('Select at least one category, business type and business stage'); return;
+  }
+  setBusy('saveSchemeBtn', true);
+  try {
+    await api(id ? `/schemes/${encodeURIComponent(id)}` : '/schemes', {method: id ? 'PUT' : 'POST', body});
+  } catch (e) { showError(e); setBusy('saveSchemeBtn', false); return; }
+  closeModal(); toast('Scheme saved');
+  await renderSchemePage().catch(showError);
+}
+async function deleteScheme(id){
+  if (!confirm('Delete this scheme?')) return;
+  try { await api(`/schemes/${encodeURIComponent(id)}`, {method:'DELETE'}); toast('Scheme deleted'); }
+  catch (e) { showError(e); return; }
+  await renderSchemePage().catch(showError);
+}
+
+/* ---------------------------------------------------------------------- *
+ * READINESS  (GET /readiness)
+ * ---------------------------------------------------------------------- */
+function readinessHTML(){
+  return `
+  <div class="title"><div><h1>Funding Readiness</h1><div class="muted">A transparent, rule-based 100-point score \u2014 not a lending decision.</div></div></div>
+  <p class="muted" style="font-size:12px; margin:-8px 0 16px">Prototype \u2014 verify the latest eligibility and application details on the official government portal.</p>
+  <div class="hero" style="grid-template-columns:200px 1fr">
+    <div id="r-donut"></div>
+    <div id="rBars" class="grid" style="gap:10px"></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3 style="font-size:16px; margin-bottom:10px">Strengths</h3><div id="rGood">${LOADING}</div></div>
+    <div class="card"><h3 style="font-size:16px; margin-bottom:10px">What you should do next</h3><div id="rGaps">${LOADING}</div></div>
+  </div>`;
+}
+async function renderReadiness(){
+  const r = await api('/readiness');
+  if (!$('r-donut')) return;
+  $('r-donut').innerHTML = donut(r.overall, 160);
+  $('rBars').innerHTML = r.categories.map(c => `
+    <div>
+      <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px">
+        <b>${esc(c.label)}</b><span class="muted">${c.score}/${c.max_score}</span>
+      </div>
+      <div class="progress"><span style="width:${Math.round(c.score / c.max_score * 100)}%"></span></div>
+    </div>`).join('');
+  $('rGood').innerHTML = r.strengths.length
+    ? r.strengths.map(x => `<div class="ledger-row tone-good" style="border:1px solid var(--line); border-radius:8px; margin-bottom:6px"><div><div>${STATUS_ICON.ok} ${esc(x.text)}</div><div class="muted" style="font-size:11px">${esc(x.category)}</div></div></div>`).join('')
+    : `<div class="empty">Complete your profile to see your strengths.</div>`;
+  $('rGaps').innerHTML = r.gaps.length
+    ? r.gaps.map(x => `<div class="ledger-row ${x.status === 'bad' ? 'tone-bad' : 'tone-warn'}" style="border:1px solid var(--line); border-radius:8px; margin-bottom:6px">
+        <div><div>${STATUS_ICON[x.status]} ${esc(x.text)}</div>${x.action ? `<div class="muted" style="font-size:11.5px; margin-top:2px">\u2192 ${esc(x.action)}</div>` : ''}</div>
+      </div>`).join('')
+    : `<div class="empty">No gaps detected against your top-matched scheme.</div>`;
+}
+
+/* ---------------------------------------------------------------------- *
+ * FUNDING TOOLS  (POST /tools/what-if · POST /tools/emi · GET /tools/funding-path)
+ * All maths runs on the server so the frontend and backend can never disagree.
+ * ---------------------------------------------------------------------- */
+function toolsHTML(){
+  const p = session.profile || {};
+  return `
+  <div class="title"><div><h1>Funding Tools</h1><div class="muted">Illustrative calculations for planning only \u2014 not a loan offer.</div></div></div>
+  <div class="toolgrid">
+    <div class="card"><h3 style="font-size:16px; margin-bottom:10px">What-if funding simulator</h3>
+      <p class="muted" style="font-size:12px; margin:-4px 0 10px">Compares your saved profile ("Current") against the numbers you enter here ("What-if").</p>
+      ${field('Funding required','simFunding',p.funding_required || 100000,'number','\u20B9')}
+      ${field('Own contribution','simOwn',p.own_contribution || 20000,'number','\u20B9')}
+      ${field('Interest rate %','simRate',10,'number','%','0','100')}
+      ${field('Loan tenure (years)','simYears',5,'number','years','0','50')}
+      ${field('Moratorium period (months)','simMoratorium',0,'number','months','0','120')}
+      <div id="simOut" style="margin-top:14px"></div></div>
+    <div class="card"><h3 style="font-size:16px; margin-bottom:10px">Loan / EMI calculator</h3>
+      ${field('Loan amount','loanAmt',100000,'number','\u20B9')}
+      ${field('Own contribution','loanOwn',20000,'number','\u20B9')}
+      ${field('Subsidy','loanSub',0,'number','\u20B9')}
+      ${field('Interest rate %','loanRate',10,'number','%','0','100')}
+      ${field('Loan tenure (years)','loanYears',5,'number','years','0','50')}
+      ${field('Moratorium period (months)','loanMoratorium',0,'number','months','0','120')}
+      <div id="loanOut" style="margin-top:14px"></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3 style="font-size:16px; margin-bottom:10px">Funding path optimizer</h3>
+    <p class="muted" style="font-size:12px; margin:-4px 0 10px">Planning illustration only \u2014 not a guaranteed approval sequence. Uses your saved funding requirement.</p>
+    <div id="pathOut">${LOADING}</div></div>`;
+}
+let simSeq = 0, loanSeq = 0;                                     // ignore out-of-order responses
+async function runSim(){
+  if (!$('simOut')) return;
+  const seq = ++simSeq;
+  const res = await api('/tools/what-if', {method:'POST', body:{
+    funding_required: numOr('simFunding', 0), own_contribution: numOr('simOwn', 0), interest_rate: numOr('simRate', 10),
+    tenure_years: numOr('simYears', 5), moratorium_months: numOr('simMoratorium', 0)}});
+  if (seq !== simSeq || !$('simOut')) return;
+  const {current:c, what_if:w} = res;
+  $('simOut').innerHTML = `
+    <div class="grid g2">
+      <div><b style="font-size:12.5px">Current scenario</b>
+        <div class="metric-line"><span>Funding</span><b>${money(c.funding_required)}</b></div>
+        <div class="metric-line"><span>Loan portion</span><b>${money(c.loan_portion)}</b></div>
+        <div class="metric-line"><span>EMI @${c.interest_rate}%, ${c.tenure_years}y</span><b>${money(Math.round(c.emi))}</b></div>
+        <div class="metric-line"><span>Top scheme</span><b>${esc(c.top_scheme_name || '\u2014')}</b></div>
+        <div class="metric-line"><span>Eligibility</span><b>${esc(ELIG_LABEL[c.eligibility_status] || '\u2014')}</b></div></div>
+      <div><b style="font-size:12.5px">What-if scenario</b>
+        <div class="metric-line"><span>Funding</span><b>${money(w.funding_required)}</b></div>
+        <div class="metric-line"><span>Loan portion</span><b>${money(w.loan_portion)}</b></div>
+        <div class="metric-line"><span>EMI @${w.interest_rate}%, ${w.tenure_years}y</span><b>${money(Math.round(w.emi))}</b></div>
+        <div class="metric-line"><span>Total repayment</span><b>${money(Math.round(w.total_repayment))}</b></div>
+        <div class="metric-line"><span>Funding gap</span><b>${money(w.funding_gap)}</b></div>
+        <div class="metric-line"><span>Top scheme</span><b>${esc(w.top_scheme_name || '\u2014')}</b></div>
+        <div class="metric-line"><span>Eligibility</span><b>${esc(ELIG_LABEL[w.eligibility_status] || '\u2014')}</b></div></div>
+    </div>
+    <p class="muted" style="font-size:11.5px; margin-top:10px">Illustrative only \u2014 actual EMI, subsidy and eligibility depend on the lender and current scheme guidelines.</p>`;
+}
+async function runLoan(){
+  if (!$('loanOut')) return;
+  const seq = ++loanSeq;
+  const r = await api('/tools/emi', {method:'POST', body:{
+    loan_amount: numOr('loanAmt', 0), own_contribution: numOr('loanOwn', 0), subsidy: numOr('loanSub', 0),
+    interest_rate: numOr('loanRate', 0), tenure_years: numOr('loanYears', 0), moratorium_months: numOr('loanMoratorium', 0)}});
+  if (seq !== loanSeq || !$('loanOut')) return;
+  $('loanOut').innerHTML = [
+    ['Net loan amount', money(r.net_loan_amount)], ['Monthly EMI', money(Math.round(r.monthly_emi))],
+    ['Total repayment', money(Math.round(r.total_repayment))], ['Total interest', money(Math.round(r.total_interest))],
+    ['Moratorium', r.moratorium_months + ' months (interest capitalized)'],
+  ].map(([l, val]) => `<div class="metric-line"><span>${l}</span><b>${val}</b></div>`).join('');
+}
+const calcSim = debounce(() => runSim().catch(showError));
+const calcLoan = debounce(() => runLoan().catch(showError));
+async function renderPathOptimizer(){
+  const path = await api('/tools/funding-path');
+  if (!$('pathOut')) return;
+  const label = s => s.source === 'scheme' ? `${schemeName(s.scheme_id)} (${ELIG_LABEL[s.eligibility_status]})` : 'Own contribution';
+  $('pathOut').innerHTML = path.total
+    ? `<div class="journey-list">
+        ${path.steps.map((s, i) => `<div class="journey-item"><span class="journey-num">${i+1}</span><div><b>${esc(label(s))} \u2192 ${money(s.amount)}</b><small>${esc(s.reason)}</small></div></div>`).join('')}
+        ${path.gap > 0 ? `<div class="journey-item"><span class="journey-num">!</span><div><b style="color:var(--rust)">Remaining gap \u2192 ${money(path.gap)}</b><small>Not covered by matched schemes or entered own contribution</small></div></div>` : `<div class="journey-item"><span class="journey-num">\u2713</span><div><b style="color:var(--banyan)">Remaining gap \u2192 \u20b90</b><small>Fully planned across schemes and own contribution</small></div></div>`}
+      </div>`
+    : `<div class="empty">Enter your funding requirement in Profile to generate a path.</div>`;
+}
+function renderTools(){
+  ['simFunding','simOwn','simRate','simYears','simMoratorium'].forEach(id => $('f-' + id)?.addEventListener('input', calcSim));
+  ['loanAmt','loanOwn','loanSub','loanRate','loanYears','loanMoratorium'].forEach(id => $('f-' + id)?.addEventListener('input', calcLoan));
+  return Promise.all([runSim(), runLoan(), renderPathOptimizer()]);
+}
+
+/* ---------------------------------------------------------------------- *
+ * PARTNERS  (GET /partners · GET /partners/nearby · admin POST/DELETE)
+ * Each partner has state, district, latitude, longitude and supported_scheme_ids,
+ * so the locator can search by state OR by distance from the user.
+ * ---------------------------------------------------------------------- */
+function partnersHTML(){
+  const isAdmin = session.role === 'admin';
+  return `
+  <div class="title"><div><h1>${tx('Partners')}</h1><div class="muted">${isAdmin ? 'Manage the partner directory.' : 'Channel partner locator \u2014 filter by state, or find partners near you.'}</div></div>
+    ${isAdmin ? `<button class="btn" onclick="partnerModal()">+ Add partner</button>` : ''}</div>
+  <p class="muted" style="font-size:12px; margin:-8px 0 16px">Prototype demo data \u2014 fund availability and processing status are not live and require verification with the partner directly.</p>
+  <div class="filters">
+    <input id="partnerSearch" class="field" placeholder="Search partner or scheme..." oninput="renderPartners()">
+    <select id="partnerState" class="field" onchange="renderPartners()"><option>All States</option></select>
+    <select id="partnerRadius" class="field" title="Search radius"><option value="25">25 km</option><option value="50">50 km</option><option value="100" selected>100 km</option><option value="250">250 km</option></select>
+    <button class="btn secondary" onclick="findNearbyPartners()">\ud83d\udccd Near me</button>
+  </div>
+  <div id="partnerNote"></div>
+  <div id="partnerList" class="grid g2">${LOADING}</div>`;
+}
+async function renderPartnerPage(){
+  session.partners = await api('/partners');
+  const sel = $('partnerState'); if (!sel) return;
+  const keep = sel.value;
+  const states = ['All States', ...new Set(session.partners.map(p => p.state).filter(Boolean))];
+  sel.innerHTML = states.map(s => `<option ${s === keep ? 'selected' : ''}>${esc(s)}</option>`).join('');
+  renderPartners();
+}
+function renderPartners(){
+  const box = $('partnerList'); if (!box) return;
+  const q = v('partnerSearch').toLowerCase(), st = v('partnerState');
+  const isAdmin = session.role === 'admin';
+  const near = session.partnerNear;
+  const source = near ? near.results : session.partners;
+  const list = source.filter(p =>
+    `${p.name} ${p.partner_type} ${p.coverage} ${p.notes} ${p.district || ''} ${p.supported_scheme_ids.map(schemeName).join(' ')}`.toLowerCase().includes(q) &&
+    (near || !st || st === 'All States' || p.state === st || p.state === null));
+  $('partnerNote').innerHTML = near
+    ? `<div class="card" style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap">
+         <span>Showing partners within <b>${near.radius} km</b> of your location (nearest first), then pan-India partners.</span>
+         <button class="btn small secondary" onclick="clearNearby()">Show all partners</button></div>` : '';
+  box.innerHTML = list.length ? list.map(p => `
+    <div class="card"><div style="display:flex; gap:6px; flex-wrap:wrap"><span class="pill">${esc(p.partner_type)}</span><span class="tag">${esc(p.state || 'All States')}</span>
+      ${p.distance_km != null ? `<span class="tag">\ud83d\udccd ${p.distance_km} km away</span>` : ''}
+      ${p.verified ? '<span class="tag" style="color:var(--banyan)">Verified</span>' : '<span class="tag" style="color:var(--rust)">Verification required</span>'}</div>
+      <h3 style="margin:8px 0 4px; font-size:16px">${esc(p.name)}</h3>
+      <p style="font-size:13px; margin:0 0 4px">${p.supported_scheme_ids.length ? esc(p.supported_scheme_ids.map(schemeName).join(', ')) : ''}${p.supported_scheme_ids.length && p.notes ? ' \u00b7 ' : ''}${esc(p.notes)}</p>
+      <div class="muted" style="font-size:12.5px">Coverage: ${esc(p.coverage || '\u2014')}${p.district ? ' \u00b7 ' + esc(p.district) : ''}</div>
+      <div style="display:flex; gap:8px; margin-top:12px">
+        <a class="btn small" target="_blank" rel="noopener noreferrer" href="${esc(safeUrl(p.website_url))}">Visit \u2197</a>
+        ${isAdmin ? `<button class="btn small danger" onclick="deletePartner('${esc(p.id)}')">Delete</button>` : ''}
+      </div></div>`).join('') : `<div class="empty" style="grid-column:1/-1">No partners found${near ? ' in this radius' : ' for this state yet'}.</div>`;
+}
+function findNearbyPartners(){
+  if (!navigator.geolocation) { toast('Location is not available in this browser.'); return; }
+  const radius = +v('partnerRadius') || 100;
+  toast('Getting your location\u2026');
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try {
+      /* rounded to ~1 km: precise enough for a locator, and keeps exact coordinates out of server logs */
+      const lat = pos.coords.latitude.toFixed(2), lng = pos.coords.longitude.toFixed(2);
+      session.partnerNear = {radius, results: await api(`/partners/nearby?lat=${lat}&lng=${lng}&radius_km=${radius}`)};
+      renderPartners();
+    } catch (e) { showError(e); }
+  }, () => toast('Could not get your location \u2014 allow location access or filter by state instead.', 4000), {timeout: 10000});
+}
+function clearNearby(){ session.partnerNear = null; renderPartners(); }
+
+function partnerModal(){
+  openModal(`<h2 style="font-family:'Fraunces',serif; margin-bottom:14px">Add partner</h2>
+    <div class="formgrid">
+      ${field('Partner name','mpName','')}${field('Type','mpType','')}${select('State (blank = pan-India)','mpState','',META.states)}
+      ${field('District','mpDistrict','')}${field('Latitude','mpLat','','text','e.g. 30.90')}${field('Longitude','mpLng','','text','e.g. 75.85')}
+      ${field('Coverage','mpCoverage','India')}${field('Official URL','mpUrl','https://')}${field('Notes','mpNotes','')}
+      ${checkGroup('Supported schemes','pschemes',session.schemes.map(s => [s.id, s.name]),[])}
+    </div>
+    <div style="display:flex; gap:8px; margin-top:16px">
+      <button id="savePartnerBtn" class="btn" onclick="savePartner()">Save</button><button class="btn secondary" onclick="closeModal()">Cancel</button>
+    </div>`);
+}
+async function savePartner(){
+  if (!fv('mpName').trim() || !fv('mpUrl').trim()) { toast('Partner name and URL are required'); return; }
+  const lat = fv('mpLat').trim(), lng = fv('mpLng').trim();
+  const body = {
+    name: fv('mpName').trim(), partner_type: fv('mpType').trim() || 'Partner', state: fv('mpState') || null,
+    district: fv('mpDistrict').trim() || null, latitude: lat === '' ? null : Number(lat), longitude: lng === '' ? null : Number(lng),
+    coverage: fv('mpCoverage').trim(), supported_scheme_ids: checkedValues('pschemes'), notes: fv('mpNotes').trim(), website_url: fv('mpUrl').trim(),
+  };
+  if ((lat !== '' && !Number.isFinite(body.latitude)) || (lng !== '' && !Number.isFinite(body.longitude))) { toast('Latitude and longitude must be numbers'); return; }
+  setBusy('savePartnerBtn', true);
+  try { await api('/partners', {method:'POST', body}); }
+  catch (e) { showError(e); setBusy('savePartnerBtn', false); return; }
+  closeModal(); toast('Partner added');
+  await renderPartnerPage().catch(showError);
+}
+async function deletePartner(id){
+  if (!confirm('Delete this partner?')) return;
+  try { await api(`/partners/${encodeURIComponent(id)}`, {method:'DELETE'}); toast('Partner deleted'); }
+  catch (e) { showError(e); return; }
+  await renderPartnerPage().catch(showError);
+}
+
+/* ---------------------------------------------------------------------- *
+ * APPLICATIONS  (GET/POST /applications · PATCH/DELETE /applications/{id})
+ * Applications reference a scheme_id, carry an application_reference, an ISO
+ * created_at and a validated snake_case status.
+ * ---------------------------------------------------------------------- */
+function appsHTML(){
+  return `
+  <div class="title"><div><h1>${tx('Applications')}</h1><div class="muted">Track your funding applications.</div></div>
+    <button class="btn" onclick="appModal()">+ Add application</button></div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+      <h3 style="font-size:16px">Application readiness checklist <span class="muted" style="font-weight:400; font-size:12px">(for your top-matched scheme)</span></h3>
+      <span class="pill green" id="appReadyPct">&mdash;</span>
+    </div>
+    <div class="progress" style="margin:10px 0"><span id="appReadyBar" style="width:0"></span></div>
+    <div id="appChecklist" class="grid" style="gap:6px"></div>
+  </div>
+  <div id="appList" class="grid">${LOADING}</div>`;
+}
+async function renderApps(){
+  const [r, apps] = await Promise.all([api('/readiness'), api('/applications')]);
+  if (!$('appList')) return;
+  $('appReadyPct').textContent = 'Application Readiness: ' + r.overall + '%';
+  $('appReadyBar').style.width = r.overall + '%';
+  $('appChecklist').innerHTML = r.categories.flatMap(c => c.items).map(x =>
+    `<div class="ledger-row ${x.status === 'ok' ? 'tone-good' : x.status === 'bad' ? 'tone-bad' : 'tone-warn'}" style="border:1px solid var(--line); border-radius:8px">${STATUS_ICON[x.status]} ${esc(x.text)}</div>`
+  ).join('');
+  const order = META.application_statuses.map(s => s.value);
+  $('appList').innerHTML = apps.length ? apps.map(a => `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; gap:12px; align-items:center">
+        <div><h3 style="font-size:16px; margin:0">${esc(a.scheme_name)}</h3><div class="muted" style="font-size:12px">${esc(a.application_reference || 'No reference')} \u00b7 ${fmtDate(a.created_at)}</div></div>
+        <select class="field" style="width:auto" onchange="updateApp('${esc(a.id)}', this.value)">
+          ${META.application_statuses.map(s => `<option value="${esc(s.value)}" ${a.status === s.value ? 'selected' : ''}>${esc(s.label)}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-top:13px" class="progress"><span style="width:${(order.indexOf(a.status) + 1) / order.length * 100}%"></span></div>
+      <div style="margin-top:12px"><button class="btn small danger" onclick="deleteApp('${esc(a.id)}')">Delete</button></div>
+    </div>`).join('') : `<div class="empty">No applications yet. Add your first application to start tracking.</div>`;
+}
+async function appModal(){
+  let topId = session.schemes[0]?.id;
+  try { topId = (await api('/readiness')).top_scheme?.scheme_id || topId; } catch (e) { /* fall back to the first scheme */ }
+  openModal(`<h2 style="font-family:'Fraunces',serif; margin-bottom:14px">Add application</h2>
+    <div class="grid" style="gap:12px">
+      ${select('Scheme','appScheme',topId,session.schemes.map(s => [s.id, s.name]))}
+      ${field('Application / reference number (optional)','appRef','')}
+    </div>
+    <div style="display:flex; gap:8px; margin-top:16px">
+      <button id="saveAppBtn" class="btn" onclick="saveApp()">Save</button><button class="btn secondary" onclick="closeModal()">Cancel</button>
+    </div>`);
+}
+async function saveApp(){
+  const scheme_id = fv('appScheme');
+  if (!scheme_id) { toast('Please choose a scheme'); return; }
+  setBusy('saveAppBtn', true);
+  try { await api('/applications', {method:'POST', body:{scheme_id, application_reference: fv('appRef').trim() || null}}); }
+  catch (e) { showError(e); setBusy('saveAppBtn', false); return; }
+  closeModal(); toast('Application added');
+  await renderApps().catch(showError);
+}
+async function updateApp(id, status){
+  try { await api(`/applications/${encodeURIComponent(id)}`, {method:'PATCH', body:{status}}); toast('Status updated'); }
+  catch (e) { showError(e); }
+  await renderApps().catch(showError);
+}
+async function deleteApp(id){
+  if (!confirm('Delete this application?')) return;
+  try { await api(`/applications/${encodeURIComponent(id)}`, {method:'DELETE'}); toast('Application deleted'); }
+  catch (e) { showError(e); }
+  await renderApps().catch(showError);
+}
+
+/* ---------------------------------------------------------------------- *
+ * AI ASSISTANT — rule-based explanation layer. Every number it quotes comes
+ * from the API (matches / readiness / documents / funding path), fetched on demand.
+ * The conversation is kept in memory only (not persisted) because it repeats personal data.
+ * ---------------------------------------------------------------------- */
+const ASSISTANT_PROMPTS = ['Which scheme is best for me?', 'Explain my readiness score', 'Why did I get that result?', 'Explain my funding path', 'What documents am I missing?', 'Tell me about MUDRA.'];
+function assistantHTML(){
+  return `
+  <div class="title"><div><h1>${tx('AI Assistant')}</h1><div class="muted">Rule-based explanation layer \u2014 reads your live profile, the scheme rule engine, and the readiness score. Not a hosted AI model.</div></div></div>
+  <div class="card">
+    <div id="messages" class="chatbox"></div>
+    <div class="chips">${ASSISTANT_PROMPTS.map(q => `<button class="btn small secondary" onclick="ask('${q.replace(/'/g, "\\'")}')">${q}</button>`).join('')}</div>
+    <div class="chatinput">
+      <input id="chatInput" class="field" placeholder="Ask about schemes, readiness, EMI, funding path..." onkeydown="if(event.key==='Enter'){event.preventDefault();ask()}">
+      <button class="btn" onclick="ask()">${tx('Send')}</button>
+    </div>
+    <div class="muted" style="font-size:11px; margin-top:8px">Guidance only \u2014 the rule engine (not this assistant) decides eligibility. Verify on official portals before applying.</div>
+  </div>`;
+}
+function renderChat(){
+  const box = $('messages'); if (!box) return;
+  box.innerHTML = `<div class="msg bot">Hello! I can explain your best-matched scheme and why, your readiness score breakdown, missing documents, your funding path, or an illustrative EMI \u2014 all computed from your saved profile, not guessed.</div>`
+    + session.chat.map(m => `<div class="msg ${m.who}">${m.text}</div>`).join('');
+  box.scrollTop = box.scrollHeight;
+}
+async function ask(q){
+  q = q || v('chatInput').trim();
+  if (!q) return;
+  const low = q.toLowerCase();
+  let answer;
+  const STATIC_TOPICS = ['mudra','pmegp','svanidhi','street vendor','emi','loan','partner'];
+  const needsProfile = ['why','result','path','optimi','best','scheme','readiness','score','document','improve'].some(k => low.includes(k))
+    && !STATIC_TOPICS.some(k => low.includes(k));
+  try {
+    if (needsProfile && session.role !== 'user') {
+      answer = 'Those answers use an entrepreneur\u2019s saved profile, so they are available on entrepreneur accounts. I can still explain PMEGP, MUDRA, PM SVANidhi, or how the EMI calculator works.';
+    } else if (low.includes('why') || low.includes('result')) {
+      const best = (await api('/schemes/matches'))[0];
+      answer = best ? `<b>${esc(best.scheme.name)}</b> was classified <b>${ELIG_LABEL[best.eligibility_status]}</b> because:<br>${best.checks.map(x => `${STATUS_ICON[x.status]} ${esc(x.text)}`).join('<br>')}`
+        : 'Complete your profile and I can explain a scheme classification.';
+    } else if (low.includes('path') || low.includes('optimi')) {
+      const path = await api('/tools/funding-path');
+      answer = path.total ? `Funding path for ${money(path.total)}:<br>${path.steps.map(s => `\u2192 ${esc(s.source === 'scheme' ? schemeName(s.scheme_id) + ' (' + ELIG_LABEL[s.eligibility_status] + ')' : 'Own contribution')}: ${money(s.amount)} (${esc(s.reason)})`).join('<br>')}${path.gap > 0 ? `<br>Remaining gap: ${money(path.gap)}` : '<br>Fully covered.'}<br><i>Planning illustration only \u2014 not a guaranteed approval sequence.</i>` : 'Enter a funding requirement in Profile first.';
+    } else if (low.includes('best') || low.includes('scheme')) {
+      const best = (await api('/schemes/matches'))[0];
+      answer = best ? `Based on your current profile, <b>${esc(best.scheme.name)}</b> is classified <b>${ELIG_LABEL[best.eligibility_status]}</b> (${best.match_pct}% of checks pass). ${best.checks.filter(x => x.status !== 'ok').slice(0, 2).map(x => esc(x.text)).join(' ')}` : 'Add a profile and some schemes first, and I can suggest a match.';
+    } else if (low.includes('readiness') || low.includes('score')) {
+      const r = await api('/readiness');
+      answer = `Your Funding Readiness Score is <b>${r.overall}/100</b>: ` + r.categories.map(c => `${esc(c.label)} ${c.score}/${c.max_score}`).join(', ') + '.' + (r.gaps[0] ? ` Biggest gap: ${esc(r.gaps[0].text)}${r.gaps[0].action ? ' \u2014 ' + esc(r.gaps[0].action) : ''}` : ' No major gaps detected.');
+    } else if (low.includes('document')) {
+      const missing = (await api('/documents')).documents.filter(d => d.status === 'missing').map(d => d.label);
+      answer = missing.length ? `You are missing: <b>${esc(missing.join(', '))}</b>.` : 'Your required prototype documents are complete.';
+    } else if (low.includes('mudra')) answer = 'MUDRA provides collateral-free credit for eligible micro enterprises and non-farm income-generating activities. Interest is market-linked, set by the lending bank/NBFC/MFI. Verify current terms on the official PMMY portal.';
+    else if (low.includes('pmegp')) answer = 'PMEGP supports new micro-enterprises through bank finance plus a margin-money subsidy, applied for via KVIC/KVIB/DIC or your bank. Typical own contribution is around 10%. Verify current terms on the official PMEGP e-portal.';
+    else if (low.includes('svanidhi') || low.includes('street vendor')) answer = 'PM SVANidhi offers small working-capital loans to street vendors holding a valid Urban Local Body vending certificate/ID, with an interest subsidy for timely repayment. Verify current terms on the official PM SVANidhi portal.';
+    else if (low.includes('emi') || low.includes('loan')) answer = 'Open Funding Tools \u2192 Loan / EMI Calculator (or the What-if simulator to compare your current vs. a hypothetical scenario, including a moratorium period).';
+    else if (low.includes('improve')) {
+      const r = await api('/readiness');
+      answer = r.gaps.length ? `Top things to fix: ${r.gaps.slice(0, 3).map(x => esc(x.action || x.text)).join('; ')}.` : 'Complete your profile, upload missing documents and keep your funding request realistic compared with turnover.';
+    } else if (low.includes('partner')) answer = 'Open Partners to filter channel partners by state, or tap "Near me" to see the closest ones. Prototype partner data is not live \u2014 fund availability needs verification with the partner directly.';
+    else answer = 'I can explain your best scheme and why, your readiness score breakdown, missing documents, your funding path, PMEGP, MUDRA, PM SVANidhi, or an illustrative EMI.';
+  } catch (e) { showError(e); answer = 'Sorry \u2014 I could not reach the server just now. Please try again.'; }
+
+  session.chat.push({who:'user', text: esc(q)}, {who:'bot', text: answer});
+  renderChat();
+  const inp = $('chatInput'); if (inp) inp.value = '';
+}
+/* ---------------------------------------------------------------------- *
+ * PROJECT MARKETPLACE  (entrepreneur <-> investor / channel partner)
+ * ---------------------------------------------------------------------- */
+function marketplaceHTML(){
+  return `
+  <div class="title"><div><h1>Project Marketplace</h1><div class="muted">Discover student and small-entrepreneur projects seeking funding and connections.</div></div>
+    ${session.role === 'user' ? `<button class="btn" onclick="go('projects')">+ Add project</button>` : ''}</div>
+  <div class="card"><div class="filters">
+    <input id="ps" class="field" placeholder="Search projects" oninput="renderMarketplace()">
+    <select id="pc" class="field" onchange="renderMarketplace()"><option value="">All categories</option>${PROJECT_CATEGORIES.map(x => `<option>${x}</option>`).join('')}</select>
+    <select id="pst" class="field" onchange="renderMarketplace()"><option value="">All stages</option>${PROJECT_STAGES.map(x => `<option>${x}</option>`).join('')}</select>
+    <input id="pf" type="number" class="field" placeholder="Max funding \u20B9" oninput="renderMarketplace()">
+    <input id="pl" class="field" placeholder="Location" oninput="renderMarketplace()">
+    <select id="psort" class="field" onchange="renderMarketplace()"><option value="new">Newest</option><option value="fund">Funding</option><option value="pop">Popularity</option></select>
+  </div><div id="mg" class="marketgrid"></div></div>`;
+}
+function projectCard(p){
+  const saved = (state.savedProjects[me()] || []).includes(p.id);
+  const inv = state.investors.find(x => x.userId === me());
+  const m = inv ? matchProject(p, inv) : null;
+  return `<div class="card" style="padding:0; overflow:hidden">
+    <div class="projectcover">${esc((p.name || 'P')[0])}</div>
+    <div class="projectbody">
+      <div class="projectmeta"><span class="pill">${esc(p.category)}</span><span class="tag">${esc(p.stage)}</span>${m !== null ? `<span class="match">Match: ${m}%</span>` : ''}</div>
+      <h3 style="font-size:15.5px; margin:4px 0">${esc(p.name)}</h3>
+      <div class="muted" style="font-size:11.5px">${esc(p.ownerName)} \u00b7 ${esc(p.location)}</div>
+      <p style="font-size:13px">${esc(p.description)}</p>
+      <div class="metric-line"><span>Funding</span><b>${money(p.funding)}</b></div>
+      <div class="metric-line"><span>Equity</span><b>${esc(p.equity)}%</b></div>
+      <div style="display:flex; gap:7px; flex-wrap:wrap; margin-top:12px">
+        <button class="btn small" onclick="viewProject('${p.id}')">View project</button>
+        ${p.ownerId !== me() && session.role !== 'admin' ? `<button class="btn small" style="background:var(--banyan)" onclick="connectProject('${p.id}')">Connect</button>` : ''}
+        <button class="btn small secondary" onclick="saveProject('${p.id}')">${saved ? '\u2605 Saved' : '\u2606 Save'}</button>
+      </div></div></div>`;
+}
+function renderMarketplace(){
+  const q = v('ps').toLowerCase(), cat = v('pc'), st = v('pst'), max = +v('pf') || 0, loc = v('pl').toLowerCase(), sort = v('psort') || 'new';
+  const list = state.projects.filter(p => p.published || p.ownerId === me())
+    .filter(p => (!q || `${p.name} ${p.description} ${p.category} ${p.ownerName}`.toLowerCase().includes(q)) && (!cat || p.category === cat) && (!st || p.stage === st) && (!max || p.funding <= max) && (!loc || p.location.toLowerCase().includes(loc)));
+  list.sort((a, b) => sort === 'fund' ? a.funding - b.funding : sort === 'pop' ? (b.popularity || 0) - (a.popularity || 0) : (b.created || 0) - (a.created || 0));
+  document.getElementById('mg').innerHTML = list.length ? list.map(projectCard).join('') : `<div class="empty" style="grid-column:1/-1">No projects match your filters.</div>`;
+}
+function matchProject(p, inv){
+  let n = 0;
+  if ((inv.categories || '').toLowerCase().includes(p.category.toLowerCase())) n++;
+  if ((inv.stages || '').toLowerCase().includes(p.stage.toLowerCase())) n++;
+  if (!inv.range) n++;
+  else { const nums = inv.range.match(/\d[\d,]*/g)?.map(x => +x.replace(/,/g, '')) || []; if (nums.length > 1 && p.funding >= nums[0] && p.funding <= nums[1]) n++; }
+  if (inv.location && p.location.toLowerCase().includes(inv.location.toLowerCase())) n++;
+  return Math.min(100, Math.round(n / 4 * 100));
+}
+function saveProject(id){
+  const arr = state.savedProjects[me()] || []; const idx = arr.indexOf(id);
+  idx < 0 ? arr.push(id) : arr.splice(idx, 1);
+  state.savedProjects[me()] = arr; persist();
+  toast(idx < 0 ? 'Project saved' : 'Removed from saved');
+  if (session.page === 'marketplace') renderMarketplace();
+  if (session.page === 'saved') renderSaved();
+}
+function savedHTML(){ return `<div class="title"><div><h1>Saved Projects</h1><div class="muted">Your saved marketplace listings.</div></div></div><div id="savedGrid" class="marketgrid"></div>`; }
+function renderSaved(){
+  const list = state.projects.filter(p => (state.savedProjects[me()] || []).includes(p.id));
+  document.getElementById('savedGrid').innerHTML = list.length ? list.map(projectCard).join('') : `<div class="empty">No saved projects yet.</div>`;
+}
+function viewProject(id){
+  const p = state.projects.find(x => x.id === id); if (!p) return;
+  p.popularity = (p.popularity || 0) + 1; persist();
+  const files = state.projectFiles[id] || [];
+  openModal(`
+    <div class="title" style="margin-bottom:12px"><div><h1 style="font-size:20px">${esc(p.name)}</h1>
+      <div class="projectmeta"><span class="pill">${esc(p.category)}</span><span class="tag">${esc(p.stage)}</span></div></div>
+      <button class="iconbtn" onclick="closeModal()">\u2715</button></div>
+    <p class="muted">${esc(p.ownerName)} \u00b7 ${esc(p.location)}</p>
+    <div class="grid g2">
+      <div class="card"><h3 style="font-size:15px">Overview</h3><p style="font-size:13px">${esc(p.description)}</p>
+        <div class="metric-line"><span>Funding</span><b>${money(p.funding)}</b></div><div class="metric-line"><span>Equity</span><b>${p.equity}%</b></div></div>
+      <div class="card"><h3 style="font-size:15px">Entrepreneur profile</h3><p style="font-size:13px">${esc(p.ownerName)}<br>${esc(p.team)}</p></div>
+      <div class="card"><h3 style="font-size:15px">Problem</h3><p style="font-size:13px">${esc(p.problem || 'Not provided')}</p></div>
+      <div class="card"><h3 style="font-size:15px">Solution</h3><p style="font-size:13px">${esc(p.solution || 'Not provided')}</p></div>
+      <div class="card full"><h3 style="font-size:15px">Documents</h3>${files.length ? files.map(f => `<div class="metric-line"><span>\ud83d\udcce ${esc(f.name)}</span><span class="tag">${esc(f.type || 'file')}</span></div>`).join('') : '<span class="muted">No documents added.</span>'}</div>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:16px">
+      ${p.ownerId !== me() ? `<button class="btn" style="background:var(--banyan)" onclick="connectProject('${p.id}');closeModal()">Connect with entrepreneur</button>` : ''}
+      <button class="btn secondary" onclick="saveProject('${p.id}');closeModal()">Save project</button>
+    </div>`);
+}
+
+function projectsHTML(){
+  return `<div class="title"><div><h1>My Projects</h1><div class="muted">Create, edit, publish and manage your project listings.</div></div>
+    <button class="btn" onclick="projectForm()">+ Add project</button></div><div id="myProjects" class="marketgrid"></div>`;
+}
+function renderProjects(){
+  const mine = state.projects.filter(p => p.ownerId === me());
+  document.getElementById('myProjects').innerHTML = mine.length ? mine.map(p => `
+    <div class="card">
+      <div class="projectmeta"><span class="pill">${esc(p.category)}</span><span class="tag">${esc(p.stage)}</span><span class="tag">${p.published ? 'Published' : 'Unpublished'}</span></div>
+      <h3 style="font-size:15.5px">${esc(p.name)}</h3><p style="font-size:13px">${esc(p.description)}</p>
+      <div class="metric-line"><span>Funding</span><b>${money(p.funding)}</b></div>
+      <div style="display:flex; gap:7px; flex-wrap:wrap; margin-top:10px">
+        <button class="btn small" onclick="viewProject('${p.id}')">View</button>
+        <button class="btn small secondary" onclick="projectForm('${p.id}')">Edit</button>
+        <button class="btn small secondary" onclick="toggleProject('${p.id}')">${p.published ? 'Unpublish' : 'Publish'}</button>
+        <button class="btn small danger" onclick="deleteProject('${p.id}')">Delete</button>
+      </div></div>`).join('') : `<div class="empty" style="grid-column:1/-1">No projects yet.</div>`;
+}
+function toggleProject(id){
+  const p = state.projects.find(x => x.id === id); p.published = !p.published;
+  persist(); renderProjects(); toast(p.published ? 'Project published' : 'Project unpublished');
+}
+function deleteProject(id){
+  if (!confirm('Delete this project?')) return;
+  state.projects = state.projects.filter(p => p.id !== id); persist(); renderProjects(); toast('Project deleted');
+}
+function projectForm(id=''){
+  const p = id ? (state.projects.find(x => x.id === id) || {}) : {};
+  document.getElementById('p-projects').innerHTML = `
+    <div class="title"><div><h1>${id ? 'Edit' : 'Add'} project</h1></div></div>
+    <div class="card"><div class="formgrid">
+      ${field('Project name','pn',p.name)}
+      ${select('Category','pcat',p.category,PROJECT_CATEGORIES)}
+      ${select('Stage','pstg',p.stage,PROJECT_STAGES)}
+      ${field('Location','plo',p.location)}
+      ${field('Funding required \u20B9','pfn',p.funding,'number')}
+      ${field('Equity offered %','peq',p.equity,'number')}
+      <div class="full">${field('Short description','pde',p.description)}</div>
+      <div class="full">${field('Problem statement','ppr',p.problem)}</div>
+      <div class="full">${field('Proposed solution','psol',p.solution)}</div>
+      ${field('Business model','pbm',p.businessModel)}
+      ${field('Team information','ptm',p.team)}
+    </div>
+    <div style="display:flex; gap:8px; margin-top:16px">
+      <button class="btn" style="background:var(--banyan)" onclick="saveProjectForm('${id}')">Save project</button>
+      <button class="btn secondary" onclick="go('projects')">Cancel</button>
+    </div></div>`;
+  session.page = 'projects';
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById('p-projects').classList.add('active');
+  renderNav();
+}
+function saveProjectForm(id){
+  if (!fv('pn').trim()) { toast('Project name is required'); return; }
+  if (!fv('pcat')) { toast('Please select a category'); return; }
+  if (!fv('pstg')) { toast('Please select a stage'); return; }
+  if ((+fv('pfn') || 0) <= 0) { toast('Funding required must be greater than 0'); return; }
+  const p = id ? state.projects.find(x => x.id === id) : {
+    id:'p-' + Date.now(), ownerId: me(), ownerName: session.user?.full_name || session.profile?.full_name || 'Entrepreneur',
+    created: Date.now(), published:false, popularity:0,
+  };
+  Object.assign(p, {
+    name: fv('pn').trim(), category: fv('pcat'), stage: fv('pstg'), location: fv('plo').trim(),
+    funding: +fv('pfn') || 0, equity: +fv('peq') || 0, description: fv('pde').trim(),
+    problem: fv('ppr').trim(), solution: fv('psol').trim(), businessModel: fv('pbm').trim(), team: fv('ptm').trim(),
+  });
+  if (!id) state.projects.push(p);
+  persist(); toast('Project saved'); renderPageShell('projects'); go('projects');
+}
+
+/* ---------------------------------------------------------------------- *
+ * CONNECTIONS & PRIVATE CHANNELS
+ * ---------------------------------------------------------------------- */
+function connectProject(pid){
+  const p = state.projects.find(x => x.id === pid);
+  if (!p || p.ownerId === me()) return;
+  const exists = state.connections.some(c => c.projectId === pid && (c.investor === me() || c.partner === me()));
+  if (exists) { toast('Request already exists'); return; }
+  state.connections.push({
+    id:'c-' + Date.now(), investor: session.role === 'investor' ? me() : '', entrepreneur: p.ownerId,
+    partner: session.role === 'partner' ? me() : '', projectId: pid, status:'Pending', date: new Date().toLocaleString(),
+  });
+  persist(); toast('Connection request sent');
+}
+function connectionsHTML(){ return `<div class="title"><div><h1>Connections</h1><div class="muted">Manage investor and partner requests.</div></div></div><div id="cl" class="grid"></div>`; }
+function connectionName(c){
+  const p = state.projects.find(x => x.id === c.projectId);
+  const inv = state.investors.find(x => x.userId === c.investor);
+  const partner = state.channelPartners.find(x => x.userId === c.partner);
+  return {project: p?.name || 'Project', owner: p?.ownerName || c.entrepreneur, investor: inv?.organization || inv?.name || c.investor, partner: partner?.name || c.partner};
+}
+function renderConnections(){
+  const list = state.connections.filter(c => session.role === 'investor' ? c.investor === me() : session.role === 'partner' ? c.partner === me() : c.entrepreneur === me());
+  document.getElementById('cl').innerHTML = list.length ? list.map(c => {
+    const n = connectionName(c);
+    let actions = session.role === 'user' && c.status === 'Pending'
+      ? `<button class="btn small" style="background:var(--banyan)" onclick="updateConnection('${c.id}','Accepted')">Accept</button><button class="btn small danger" onclick="updateConnection('${c.id}','Rejected')">Reject</button>`
+      : '';
+    if (c.status === 'Accepted') actions += `<button class="btn small secondary" onclick="openPrivate('${c.id}')">Private channel</button>`;
+    return `<div class="ledger-row" style="border:1px solid var(--line); border-radius:var(--radius-lg); margin-bottom:8px">
+      <div><b>${esc(n.project)}</b><div class="muted" style="font-size:12px">${esc(n.investor || n.partner)} \u2194 ${esc(n.owner)} \u00b7 ${esc(c.date)}</div></div>
+      <div style="display:flex; gap:7px; align-items:center"><span class="pill ${c.status === 'Accepted' ? 'green' : ''}">${c.status}</span>${actions}</div></div>`;
+  }).join('') : `<div class="empty">No connection requests yet.</div>`;
+}
+function updateConnection(id, status){
+  const c = state.connections.find(x => x.id === id); if (!c) return;
+  c.status = status; persist(); renderConnections(); toast('Connection ' + status.toLowerCase());
+}
+function privateHTML(){
+  return `<div class="title"><div><h1>Private Channels</h1><div class="muted">Available only after an accepted connection.</div></div></div>
+    <div id="plc" class="grid" style="margin-bottom:14px"></div>
+    <div class="card"><small class="muted">Frontend prototype: real private messaging needs a secure backend and encrypted storage.</small></div>`;
+}
+function renderPrivate(){
+  const list = state.connections.filter(c => c.status === 'Accepted' && (c.investor === me() || c.entrepreneur === me() || c.partner === me()));
+  document.getElementById('plc').innerHTML = list.length ? list.map(c => `
+    <div class="ledger-row" style="border:1px solid var(--line); border-radius:var(--radius-lg)">
+      <b>${esc(connectionName(c).project)}</b><button class="btn small" onclick="openPrivate('${c.id}')">Open channel</button></div>`).join('') : `<div class="empty">No private channels.</div>`;
+}
+function openPrivate(id){
+  const c = state.connections.find(x => x.id === id);
+  if (!c || c.status !== 'Accepted' || ![c.investor, c.entrepreneur, c.partner].includes(me())) return;
+  const n = connectionName(c);
+  const msgs = state.messages.filter(x => x.connectionId === id);
+  openModal(`
+    <div class="title" style="margin-bottom:10px"><div><h1 style="font-size:19px">Private channel</h1><div class="muted">${esc(n.project)}</div></div>
+      <button class="iconbtn" onclick="closeModal()">\u2715</button></div>
+    <div id="chatbox" class="chatbox">${msgs.length ? msgs.map(m => `<div class="msg ${m.from === me() ? 'user' : 'bot'}">${esc(m.text)}</div>`).join('') : '<div class="muted">No messages yet.</div>'}</div>
+    <div class="chatinput"><input id="chatin" class="field" placeholder="Write a message..."><button class="btn" onclick="sendPrivate('${id}')">Send</button></div>`);
+}
+function sendPrivate(id){
+  const box = document.getElementById('chatin'), text = box.value.trim(); if (!text) return;
+  state.messages.push({connectionId: id, from: me(), text, time: new Date().toLocaleString()});
+  persist(); openPrivate(id);
+}
+
+/* ---------------------------------------------------------------------- *
+ * INVESTOR & PARTNER DASHBOARDS
+ * ---------------------------------------------------------------------- */
+function investorDashHTML(){
+  return `
+  <div class="title"><div><h1>Investor Dashboard</h1><div class="muted">Projects matched to your preferences.</div></div>
+    <button class="btn" onclick="go('marketplace')">Explore marketplace</button></div>
+  <div class="grid metric-row" id="is"></div>
+  <div class="card"><h3 style="font-size:16px; margin-bottom:12px">Recommended projects</h3><div id="ir" class="marketgrid"></div></div>`;
+}
+function renderInvestorDash(){
+  const inv = state.investors.find(x => x.userId === me()) || {};
+  const list = state.projects.filter(p => p.published).sort((a, b) => matchProject(b, inv) - matchProject(a, inv));
+  const savedCount = (state.savedProjects[me()] || []).length;
+  const requestsSent = state.connections.filter(c => c.investor === me()).length;
+  const accepted = state.connections.filter(c => c.investor === me() && c.status === 'Accepted').length;
+  document.getElementById('is').innerHTML = [
+    ['Projects available', list.length], ['Saved projects', savedCount], ['Requests sent', requestsSent], ['Accepted connections', accepted],
+  ].map(([label, val]) => `<div class="metric-card"><div class="label">${label}</div><div class="value">${val}</div></div>`).join('');
+  document.getElementById('ir').innerHTML = list.slice(0, 6).map(projectCard).join('') || `<div class="empty">No projects available.</div>`;
+}
+function partnerDashHTML(){
+  return `
+  <div class="title"><div><h1>Partner Dashboard</h1><div class="muted">Find projects suitable for your services and supported schemes.</div></div>
+    <button class="btn" onclick="go('marketplace')">Explore projects</button></div>
+  <div class="grid metric-row" id="pss"></div>
+  <div class="card"><h3 style="font-size:16px; margin-bottom:12px">Relevant projects</h3><div id="pr" class="marketgrid"></div></div>`;
+}
+function renderPartnerDash(){
+  const list = state.projects.filter(x => x.published);
+  const conns = state.connections.filter(x => x.partner === me());
+  document.getElementById('pss').innerHTML = [
+    ['Relevant projects', list.length], ['Entrepreneurs', new Set(list.map(x => x.ownerId)).size],
+    ['Connection requests', conns.length], ['Accepted connections', conns.filter(x => x.status === 'Accepted').length],
+  ].map(([label, val]) => `<div class="metric-card"><div class="label">${label}</div><div class="value">${val}</div></div>`).join('');
+  document.getElementById('pr').innerHTML = list.slice(0, 6).map(projectCard).join('');
+}
+
+/* ---------------------------------------------------------------------- *
+ * ADMIN — Users & Settings
+ * ---------------------------------------------------------------------- */
+function adminDashHTML(){
+  return `<div class="greeting-row"><div><h1>Admin overview</h1><div class="muted">Reference data and accounts on the server.</div></div></div>
+  <div class="grid metric-row">
+    <div class="metric-card"><div class="label">Registered users</div><div class="value" id="a-users">&mdash;</div><div class="sub" id="a-roles"></div></div>
+    <div class="metric-card"><div class="label">Schemes</div><div class="value" id="a-schemes">&mdash;</div><div class="sub">in the catalogue</div></div>
+    <div class="metric-card"><div class="label">Partners</div><div class="value" id="a-partners">&mdash;</div><div class="sub" id="a-geo"></div></div>
+  </div>
+  <div class="card" style="display:flex; gap:8px; flex-wrap:wrap">
+    <button class="btn" onclick="go('schemes')">Manage schemes</button>
+    <button class="btn secondary" onclick="go('partners')">Manage partners</button>
+    <button class="btn secondary" onclick="go('users')">View users</button>
+  </div>`;
+}
+async function renderAdminDash(){
+  const [users, schemes, partners] = await Promise.all([api('/admin/users'), api('/schemes'), api('/partners')]);
+  if (!$('a-users')) return;
+  const byRole = users.reduce((m, u) => (m[u.role] = (m[u.role] || 0) + 1, m), {});
+  $('a-users').textContent = users.length;
+  $('a-roles').textContent = Object.entries(byRole).map(([r, n]) => `${n} ${r}`).join(' \u00b7 ');
+  $('a-schemes').textContent = schemes.length;
+  $('a-partners').textContent = partners.length;
+  $('a-geo').textContent = `${partners.filter(p => p.latitude != null).length} with map coordinates`;
+}
+function usersHTML(){
+  return `<div class="title"><div><h1>Users</h1><div class="muted">Registered accounts (from the server). Passwords are hashed and never shown.</div></div></div>
+  <div class="ledger"><table class="table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead><tbody id="usersTable"><tr><td colspan="4">Loading\u2026</td></tr></tbody></table></div>`;
+}
+async function renderUsers(){
+  const users = await api('/admin/users');
+  const body = $('usersTable'); if (!body) return;
+  body.innerHTML = users.map(u => `<tr><td>${esc(u.full_name)}</td><td>${esc(u.email)}</td><td>${esc(u.role)}</td><td>${fmtDate(u.created_at)}</td></tr>`).join('');
+}
+function settingsHTML(){
+  return `<div class="title"><div><h1>Settings</h1><div class="muted">Appearance and local demo data.</div></div></div>
+  <div class="grid g2">
+    <div class="card"><h3 style="font-size:16px">Appearance</h3><p class="muted" style="font-size:13px">Theme and language are saved in this browser's local storage.</p>
+      <button class="btn secondary" onclick="go('dashboard')">Back to dashboard</button></div>
+    <div class="card"><h3 style="font-size:16px">Local marketplace data</h3><p class="muted" style="font-size:13px">Reset the browser-only marketplace demo (projects, saved projects, connections, private messages). Accounts, schemes, partners, profiles, documents and applications live on the server and are not affected.</p>
+      <button class="btn danger" onclick="resetData()">Reset marketplace demo data</button></div>
+  </div>`;
+}
+function resetData(){
+  if (!confirm('Reset the local marketplace demo data?')) return;
+  const keep = {theme: state.theme, lang: state.lang};
+  state = {...defaultState(), ...keep};
+  persist();
+  ensureRoleProfile(session.user);
+  renderPages(); go('dashboard');
+  toast('Marketplace demo data reset');
+}
+
+</script>
+</body>
+</html>
